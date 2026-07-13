@@ -138,38 +138,89 @@
             </div>
           </div>
 
-          <div class="hero__stage" aria-hidden="true">
-            <div class="cabin">
-              <div class="cabin__bar">
-                <span></span><span></span><span></span>
+          <div class="hero__stage">
+            <article class="hero-showcase" data-hero-showcase>
+              <div class="hero-showcase__topline">
+                <span class="mini-label">Real Bay Area installs</span>
+                <span class="hero-showcase__status"><i aria-hidden="true"></i> Now booking</span>
               </div>
-              <div class="cabin__roof">
-                <i style="--x: 11%; --y: 22%; --d: 0.2s"></i>
-                <i style="--x: 21%; --y: 48%; --d: 0.9s"></i>
-                <i style="--x: 29%; --y: 31%; --d: 1.5s"></i>
-                <i style="--x: 38%; --y: 60%; --d: 0.5s"></i>
-                <i style="--x: 43%; --y: 19%; --d: 0.6s"></i>
-                <i style="--x: 50%; --y: 40%; --d: 1.2s"></i>
-                <i style="--x: 56%; --y: 26%; --d: 1.1s"></i>
-                <i style="--x: 63%; --y: 55%; --d: 0.3s"></i>
-                <i style="--x: 68%; --y: 24%; --d: 0.4s"></i>
-                <i style="--x: 78%; --y: 52%; --d: 1.8s"></i>
-                <i style="--x: 84%; --y: 33%; --d: 1.0s"></i>
-                <i style="--x: 88%; --y: 47%; --d: 1.3s"></i>
-                <b class="cabin__meteor"></b>
+
+              <figure class="hero-showcase__figure">
+                <div class="hero-showcase__media">
+                  <img
+                    data-showcase-image
+                    src="images/starlight-mercedes-wide-800.jpg"
+                    alt="White Mercedes with its doors open and a finished ice-white starlight headliner"
+                    width="800"
+                    height="600"
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="async"
+                  />
+                  <span class="hero-showcase__badge">Finished by Bay Area Auto Customz</span>
+                </div>
+                <figcaption class="hero-showcase__caption" aria-live="polite">
+                  <div>
+                    <span class="hero-showcase__kicker" data-showcase-kicker>Signature white</span>
+                    <strong data-showcase-title>Full-cabin transformation</strong>
+                    <p data-showcase-copy>Ice-white stars · clean hidden wiring · OEM-style finish</p>
+                  </div>
+                </figcaption>
+              </figure>
+
+              <div class="hero-showcase__picker">
+                <span class="hero-showcase__prompt">Pick your look</span>
+                <div class="hero-showcase__options" role="group" aria-label="Choose a featured starlight look">
+                  <button
+                    class="hero-showcase__option is-active"
+                    type="button"
+                    aria-pressed="true"
+                    data-showcase-option
+                    data-src="images/starlight-mercedes-wide-800.jpg"
+                    data-alt="White Mercedes with its doors open and a finished ice-white starlight headliner"
+                    data-kicker="Signature white"
+                    data-title="Full-cabin transformation"
+                    data-copy="Ice-white stars · clean hidden wiring · OEM-style finish"
+                    data-position="center"
+                    data-color="white"
+                    data-kit="750"
+                  ><i class="hero-showcase__dot hero-showcase__dot--white" aria-hidden="true"></i>Signature</button>
+                  <button
+                    class="hero-showcase__option"
+                    type="button"
+                    aria-pressed="false"
+                    data-showcase-option
+                    data-src="images/starlight-roof-purple-800.jpg"
+                    data-alt="Mercedes interior glowing violet under a purple starlight headliner"
+                    data-kicker="Violet glow"
+                    data-title="Purple night-sky finish"
+                    data-copy="Rich violet fibers · adjustable twinkle · tailored star density"
+                    data-position="center 35%"
+                    data-color="purple"
+                    data-kit="750"
+                  ><i class="hero-showcase__dot hero-showcase__dot--purple" aria-hidden="true"></i>Violet</button>
+                  <button
+                    class="hero-showcase__option"
+                    type="button"
+                    aria-pressed="false"
+                    data-showcase-option
+                    data-src="images/starlight-camaro-blue-800.jpg"
+                    data-alt="Camaro cabin with an ice-blue fiber-optic starlight headliner"
+                    data-kicker="Ice blue"
+                    data-title="Cool blue constellation"
+                    data-copy="Crisp blue fibers · custom placement · app-controlled intensity"
+                    data-position="center 32%"
+                    data-color="blue"
+                    data-kit="750"
+                  ><i class="hero-showcase__dot hero-showcase__dot--blue" aria-hidden="true"></i>Ice blue</button>
+                </div>
               </div>
-              <div class="cabin__dash"></div>
-              <div class="cabin__seats"><span></span><span></span></div>
-            </div>
-            <div class="float-chip float-chip--rating">
-              <span>Google rating</span>
-              <strong>4.9 ★★★★★</strong>
-            </div>
-            <div class="float-chip float-chip--book">
-              <span>Next step</span>
-              <strong>Book a consult</strong>
-              <small>Call or text in one tap</small>
-            </div>
+
+              <a class="hero-showcase__start" href="#studio" data-showcase-start>
+                <span>Start with this finish</span>
+                <strong>Load a 750-star preview <span aria-hidden="true">→</span></strong>
+              </a>
+            </article>
           </div>
         </section>
 

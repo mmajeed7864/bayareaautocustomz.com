@@ -59,6 +59,76 @@
   syncScrollPadding();
   window.addEventListener("resize", syncScrollPadding);
 
+  /* -------------------------------------------------- hero build selector */
+  const heroShowcase = $("[data-hero-showcase]");
+  if (heroShowcase) {
+    const image = $("[data-showcase-image]", heroShowcase);
+    const kicker = $("[data-showcase-kicker]", heroShowcase);
+    const title = $("[data-showcase-title]", heroShowcase);
+    const copy = $("[data-showcase-copy]", heroShowcase);
+    const start = $("[data-showcase-start]", heroShowcase);
+    const options = $$('[data-showcase-option]', heroShowcase);
+    let selected = options.find((option) => option.getAttribute("aria-pressed") === "true") || options[0];
+    let swapId = 0;
+
+    const activate = (option) => {
+      if (!option) return;
+      selected = option;
+      options.forEach((btn) => {
+        const active = btn === option;
+        btn.classList.toggle("is-active", active);
+        btn.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+
+      if (kicker) kicker.textContent = option.dataset.kicker || "Featured finish";
+      if (title) title.textContent = option.dataset.title || "Custom starlight finish";
+      if (copy) copy.textContent = option.dataset.copy || "Built around your vehicle and your style";
+
+      if (image && option.dataset.src && image.getAttribute("src") !== option.dataset.src) {
+        const thisSwap = ++swapId;
+        image.classList.add("is-swapping");
+        const next = new Image();
+        next.onload = () => {
+          if (thisSwap !== swapId) return;
+          image.src = option.dataset.src;
+          image.alt = option.dataset.alt || "Finished custom starlight headliner";
+          image.style.objectPosition = option.dataset.position || "center";
+          requestAnimationFrame(() => image.classList.remove("is-swapping"));
+        };
+        next.onerror = () => {
+          if (thisSwap === swapId) image.classList.remove("is-swapping");
+        };
+        next.src = option.dataset.src;
+      }
+    };
+
+    options.forEach((option, index) => {
+      option.addEventListener("click", () => activate(option));
+      option.addEventListener("keydown", (event) => {
+        if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+        event.preventDefault();
+        const step = event.key === "ArrowRight" ? 1 : -1;
+        const next = options[(index + step + options.length) % options.length];
+        next.focus();
+        activate(next);
+      });
+      if (option.dataset.src) {
+        const preload = new Image();
+        preload.src = option.dataset.src;
+      }
+    });
+
+    if (start) {
+      start.addEventListener("click", () => {
+        if (!selected) return;
+        const color = selected.dataset.color;
+        const kit = selected.dataset.kit;
+        if (color) $(`[data-color="${color}"]`)?.click();
+        if (kit) $(`[data-kit-count="${kit}"]`)?.click();
+      });
+    }
+  }
+
   /* ============================ STARLIGHT STUDIO ======================== */
   const canvas = $("#headliner");
   if (canvas) initStudio(canvas);
@@ -116,15 +186,29 @@
     const bctx = base.getContext("2d");
     let baseReady = false;
 
-    function roundRectPath(c, R) {
+    function addRoundRect(c, R) {
       const rr = Math.min(R.r, R.w / 2, R.h / 2);
-      c.beginPath();
       c.moveTo(R.x + rr, R.y);
       c.arcTo(R.x + R.w, R.y, R.x + R.w, R.y + R.h, rr);
       c.arcTo(R.x + R.w, R.y + R.h, R.x, R.y + R.h, rr);
       c.arcTo(R.x, R.y + R.h, R.x, R.y, rr);
       c.arcTo(R.x, R.y, R.x + R.w, R.y, rr);
       c.closePath();
+    }
+
+    function roundRectPath(c, R) {
+      c.beginPath();
+      addRoundRect(c, R);
+    }
+
+    // Treat the sunroof and fixed hardware as real holes in the installable
+    // fabric, so animated glow can never be painted over glass or trim.
+    function clipInstallSurface(c) {
+      c.beginPath();
+      addRoundRect(c, PANEL);
+      if (state.sunroof) addRoundRect(c, SUNROOF);
+      HARDWARE.forEach((R) => addRoundRect(c, R));
+      c.clip("evenodd");
     }
 
     function inRoundRect(p, R) {
@@ -301,23 +385,86 @@
       update();
     }
 
+    // Liang-Barsky segment/box test. The collision check covers the meteor's
+    // complete sweep — earliest tail through final head — plus its glow width.
+    function segmentHitsRect(a, b, R, pad = 0) {
+      const left = R.x - pad;
+      const right = R.x + R.w + pad;
+      const top = R.y - pad;
+      const bottom = R.y + R.h + pad;
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      let t0 = 0;
+      let t1 = 1;
+      const clip = (p, q) => {
+        if (Math.abs(p) < 1e-9) return q >= 0;
+        const t = q / p;
+        if (p < 0) {
+          if (t > t1) return false;
+          if (t > t0) t0 = t;
+        } else {
+          if (t < t0) return false;
+          if (t < t1) t1 = t;
+        }
+        return true;
+      };
+      return clip(-dx, a.x - left) && clip(dx, right - a.x) && clip(-dy, a.y - top) && clip(dy, bottom - a.y);
+    }
+
+    function trailHitsSunroof(trail) {
+      if (!state.sunroof) return false;
+      const length = Math.hypot(trail.dx, trail.dy) || 1;
+      const ux = trail.dx / length;
+      const uy = trail.dy / length;
+      return segmentHitsRect(
+        { x: trail.x0 - ux * trail.tail, y: trail.y0 - uy * trail.tail },
+        { x: trail.x0 + trail.dx, y: trail.y0 + trail.dy },
+        SUNROOF,
+        12
+      );
+    }
+
+    function makeShootingTrail() {
+      const angle = random(-0.16, 0.12);
+      const travel = random(PANEL.w * 0.42, PANEL.w * 0.6);
+      return {
+        x0: random(PANEL.x + PANEL.w * 0.04, PANEL.x + PANEL.w * 0.28),
+        y0: random(PANEL.y + PANEL.h * 0.12, PANEL.y + PANEL.h * 0.88),
+        dx: Math.cos(angle) * travel,
+        dy: Math.sin(angle) * travel,
+        tail: random(95, 155),
+        cycle: random(2600, 4600),
+        offset: random(0, 4600),
+        color: state.color === "rgb" ? "#f6fbff" : resolveColor(),
+      };
+    }
+
+    function safeShootingTrail(index) {
+      const above = index % 2 === 0;
+      return {
+        x0: PANEL.x + PANEL.w * 0.08,
+        y0: above ? SUNROOF.y - 20 : SUNROOF.y + SUNROOF.h + 20,
+        dx: PANEL.w * 0.56,
+        dy: 0,
+        tail: 110 + index * 8,
+        cycle: 3000 + index * 450,
+        offset: index * 950,
+        color: state.color === "rgb" ? "#f6fbff" : resolveColor(),
+      };
+    }
+
     function addShootingStars(count = 3) {
       state.trails = [];
       for (let i = 0; i < count; i += 1) {
-        // meteors streak toward the front (left→right, slight tilt) and repeat
-        // after a gap; store the path + timing so render() animates it from `time`.
-        const angle = random(-0.16, 0.12);
-        const travel = random(PANEL.w * 0.42, PANEL.w * 0.6);
-        state.trails.push({
-          x0: random(PANEL.x + PANEL.w * 0.04, PANEL.x + PANEL.w * 0.28),
-          y0: random(PANEL.y + PANEL.h * 0.12, PANEL.y + PANEL.h * 0.88),
-          dx: Math.cos(angle) * travel,
-          dy: Math.sin(angle) * travel,
-          tail: random(95, 155),
-          cycle: random(2600, 4600), // ms for one streak + gap
-          offset: random(0, 4600), // stagger so they don't fire in unison
-          color: state.color === "rgb" ? "#f6fbff" : resolveColor(),
-        });
+        let trail = null;
+        for (let tries = 0; tries < 48; tries += 1) {
+          const candidate = makeShootingTrail();
+          if (!trailHitsSunroof(candidate)) {
+            trail = candidate;
+            break;
+          }
+        }
+        state.trails.push(trail || safeShootingTrail(i));
       }
     }
 
@@ -497,8 +644,7 @@
       ctx.drawImage(base, 0, 0);
 
       ctx.save();
-      roundRectPath(ctx, PANEL);
-      ctx.clip();
+      clipInstallSurface(ctx);
 
       // constellation lines
       if (state.lines.length) {
@@ -851,12 +997,14 @@
         // cleared kit or wipe hand-placed additions.
         if (state.mode === "kit" && state.lastKitCount && state.stars.length) {
           fillKit(state.lastKitCount);
-          if (els.shooting && els.shooting.checked) addShootingStars();
-          update(); // refresh the "+ shooting stars" note after the re-lay
         } else {
           fieldDirty = true;
-          update();
         }
+        // Existing meteor paths may have been valid without glass. Rebuild
+        // them for the current roof so Design mode and kit previews stay safe.
+        if (els.shooting && els.shooting.checked) addShootingStars();
+        else state.trails = [];
+        update();
       });
     }
 
