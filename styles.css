@@ -598,7 +598,10 @@ h1 {
   border-radius: 1rem;
   background: linear-gradient(110deg, rgba(215, 168, 79, 0.16), rgba(255, 221, 138, 0.05));
   color: var(--ink);
+  font: inherit;
   text-decoration: none;
+  text-align: left;
+  cursor: pointer;
   transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
 }
 
