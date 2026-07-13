@@ -125,13 +125,8 @@
         const kit = selected.dataset.showcaseKit;
         if (color) $(`[data-color="${color}"]`)?.click();
         if (kit) $(`[data-kit-count="${kit}"]`)?.click();
-        const finish = selected.textContent.trim();
-        prefillBooking({
-          service: "Starlight headliner",
-          details: `Interested in a ${kit}-star ${finish} starlight headliner.`,
-          scroll: true,
-          focus: true,
-        });
+        const studio = $("#studio");
+        if (studio) studio.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
       });
     }
   }
