@@ -1901,6 +1901,19 @@ img.tile__media {
   transition: border-color 150ms ease;
 }
 
+/* Keep the browser's native service menu readable when it opens.  Windows
+   otherwise pairs the site's light inherited text with a white option panel. */
+.booking__form select {
+  color-scheme: dark;
+  background-color: #171512;
+  color: #f5f1e8;
+}
+
+.booking__form select option {
+  background-color: #171512;
+  color: #f5f1e8;
+}
+
 .booking__form [aria-invalid="true"] {
   border-color: rgba(255, 111, 72, 0.65);
 }
