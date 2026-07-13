@@ -121,7 +121,7 @@
     if (start) {
       start.addEventListener("click", () => {
         if (!selected) return;
-        const color = selected.dataset.color;
+        const color = selected.dataset.showcaseColor;
         const kit = selected.dataset.kit;
         if (color) $(`[data-color="${color}"]`)?.click();
         if (kit) $(`[data-kit-count="${kit}"]`)?.click();
