@@ -429,6 +429,9 @@ h1 {
   position: relative;
   aspect-ratio: 4 / 3;
   overflow: hidden;
+  background-image: var(--showcase-image);
+  background-position: var(--showcase-position, center);
+  background-size: cover;
 }
 
 .hero-showcase__media::after {
@@ -445,6 +448,7 @@ h1 {
   display: block;
   object-fit: cover;
   object-position: center;
+  opacity: 0;
   filter: saturate(1.05) contrast(1.04);
   transition: opacity 180ms ease, transform 500ms ease;
 }
@@ -525,7 +529,7 @@ h1 {
 
 .hero-showcase__options {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.45rem;
 }
 
@@ -585,6 +589,13 @@ h1 {
 .hero-showcase__dot--blue {
   background: #68d7ff;
   box-shadow: 0 0 10px rgba(104, 215, 255, 0.7);
+}
+
+.hero-showcase__dot--rgb {
+  background: linear-gradient(135deg, #ff4fc8 5%, #8b5cff 35%, #52d9ff 65%, #63e48f 95%);
+  box-shadow:
+    0 0 8px rgba(139, 92, 255, 0.6),
+    0 0 12px rgba(82, 217, 255, 0.45);
 }
 
 .hero-showcase__start {
@@ -2476,6 +2487,7 @@ img.tile__media {
   }
 
   .hero-showcase__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.35rem;
   }
 

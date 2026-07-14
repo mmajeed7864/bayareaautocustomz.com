@@ -93,6 +93,8 @@
           image.src = option.dataset.src;
           image.alt = option.dataset.alt || "Finished custom starlight headliner";
           image.style.objectPosition = option.dataset.position || "center";
+          image.parentElement.style.setProperty("--showcase-image", `url("${option.dataset.src}")`);
+          image.parentElement.style.setProperty("--showcase-position", option.dataset.position || "center");
           requestAnimationFrame(() => image.classList.remove("is-swapping"));
         };
         next.onerror = () => {
