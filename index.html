@@ -104,7 +104,7 @@
           <a href="#services">Services</a>
           <a href="#pricing">Pricing</a>
           <a href="#ambient">Ambient kits</a>
-          <a href="#kits">DIY kits</a>
+          <a href="#kits">Take-home kits</a>
           <a href="#reviews">Reviews</a>
         </nav>
         <div class="header__actions">
@@ -274,7 +274,7 @@
                   width="1200"
                   height="740"
                   tabindex="0"
-                  aria-label="Starlight headliner preview. Use the kit-size buttons to preview star density. In design mode, use the arrow keys to move the cursor and Enter to place or erase a star."
+                  aria-label="Starlight headliner preview with a regular sunroof selected. Use the kit-size buttons to preview star density. In design mode, use the arrow keys to move the cursor and Enter to place or erase a star."
                 ></canvas>
                 <p class="canvas-hint" data-hint>Pick a kit size to preview the density.</p>
               </div>
@@ -363,12 +363,13 @@
 
               <div class="field">
                 <span class="field__label">Roof type</span>
-                <div class="chips chips--roof" role="group" aria-label="Sunroof type">
-                  <button class="chip" type="button" data-roof="none">No sunroof</button>
-                  <button class="chip is-active" type="button" data-roof="regular">Regular</button>
-                  <button class="chip" type="button" data-roof="dual">Dual</button>
-                  <button class="chip" type="button" data-roof="pano">Panoramic</button>
+                <div class="chips chips--roof" role="group" aria-label="Roof type">
+                  <button class="chip" type="button" data-roof="none" aria-pressed="false">No sunroof</button>
+                  <button class="chip is-active" type="button" data-roof="regular" aria-pressed="true">Regular</button>
+                  <button class="chip" type="button" data-roof="dual" aria-pressed="false">Dual</button>
+                  <button class="chip" type="button" data-roof="pano" aria-pressed="false">Panoramic</button>
                 </div>
+                <p class="field__note" data-roof-status role="status" aria-live="polite">Regular sunroof selected. Stars and shooting trails avoid the glass.</p>
               </div>
 
               <label class="field toggle">
@@ -1020,7 +1021,7 @@
             </article>
 
             <article class="price-card">
-              <div class="price-card__head"><h3>Ambient lighting</h3></div>
+              <div class="price-card__head"><h3>Ambient lighting</h3><span class="price-card__tag">installed</span></div>
               <ul class="price-list">
                 <li><span>Basic</span><span>from $650</span></li>
                 <li><span>Premium</span><span>from $750</span></li>
@@ -1125,7 +1126,7 @@
                 </li>
               </ul>
               <div class="ambient__actions">
-                <button class="btn btn--gold" type="button" data-kit="RGB ambient lighting kit">Add to my quote</button>
+                <a class="btn btn--gold" href="#kits">Compare take-home kits</a>
                 <a class="btn btn--ghost" href="#book">Book a pro install</a>
               </div>
               <p class="ambient__handle">
@@ -1183,29 +1184,34 @@
           </div>
         </section>
 
-        <!-- ========================== DIY KITS ========================== -->
+        <!-- ====================== TAKE-HOME DIY KITS ===================== -->
         <section class="section kits-section" id="kits">
           <div class="section__intro">
-            <span class="eyebrow eyebrow--rgb">DIY kits</span>
+            <span class="eyebrow eyebrow--rgb">Take-home DIY kits</span>
             <h2>Take the glow home.</h2>
             <p>
-              Prefer to install it yourself? Grab a kit. Each one ships with the LED engine, fiber
-              or strips, remote, and a setup guide. Not sure which to get — ask the assistant.
+              Buy the hardware and install it yourself. These are product-only take-home prices;
+              installed services use a separate star-count and price list above.
             </p>
           </div>
 
-          <!-- Kit prices = Sergio's take-home list (email 2026-07-16). NOTE: kit tiers
-               genuinely include 750★ and 860★ — a DIFFERENT scale from the installed-service
-               tiers (850★); do not "normalize" them. Shooting-star add-on still unpriced. -->
+          <!-- Sergio-confirmed take-home prices, 2026-07-16. The take-home starlight
+               line genuinely uses 750★ and 860★; installed service keeps its 850★ tier. -->
           <div class="kits">
-            <article class="kit">
+            <article class="kit kit--takehome">
               <div class="kit__visual kit__visual--fiber" aria-hidden="true">
                 <span class="kit__fiber"></span><span class="kit__fiber"></span><span class="kit__fiber"></span>
               </div>
               <div class="kit__body">
-                <h3>Fiber-optic starlight kit</h3>
-                <p>LED engine, fiber bundle, remote, and a starter install guide. App + Bluetooth control, music-sync twinkle, RGBW color.</p>
-                <ul class="kit__tiers">
+                <span class="kit__tag">Take-home · product only</span>
+                <h3>Fiber-optic starlight kits</h3>
+                <p class="kit__lede">Choose the sky you want, then ask us to confirm starlight-kit shipping and availability.</p>
+                <div class="kit__specs" aria-label="Starlight kit features by size">
+                  <p><strong>300–400★ · Starter sky</strong> Compact split-design engine, 1.5m path, 16W, 0.5mm fibers, app/Bluetooth/24-key remote, music sync, RGBW.</p>
+                  <p><strong>500–860★ · Full night sky</strong> 16W high-output engine, 22mm port, 3m premium 0.75mm strands, twinkle turntable, 28-key remote + app, 16M+ colors.</p>
+                  <p><strong>1,100★ · Showstopper</strong> PMMA end-glow fibers, 16W RGBW with a true pure-white channel, music-reactive twinkle, app/Bluetooth/28-key remote.</p>
+                </div>
+                <ul class="kit__tiers" aria-label="Take-home starlight kit prices">
                   <li><span>300★</span><span>$100</span></li>
                   <li><span>400★</span><span>$130</span></li>
                   <li><span>500★</span><span>$180</span></li>
@@ -1214,36 +1220,60 @@
                   <li><span>860★</span><span>$300</span></li>
                   <li><span>1,100★</span><span>$350</span></li>
                 </ul>
+                <label class="kit__picker">
+                  <span>Choose a take-home kit</span>
+                  <select data-kit-choice>
+                    <option data-details="Interested in the 300-star take-home starlight kit ($100). Please confirm starlight-kit shipping and availability.">300★ — $100</option>
+                    <option data-details="Interested in the 400-star take-home starlight kit ($130). Please confirm starlight-kit shipping and availability.">400★ — $130</option>
+                    <option data-details="Interested in the 500-star take-home starlight kit ($180). Please confirm starlight-kit shipping and availability.">500★ — $180</option>
+                    <option data-details="Interested in the 650-star take-home starlight kit ($200). Please confirm starlight-kit shipping and availability.">650★ — $200</option>
+                    <option data-details="Interested in the 750-star take-home starlight kit ($250). Please confirm starlight-kit shipping and availability.">750★ — $250</option>
+                    <option data-details="Interested in the 860-star take-home starlight kit ($300). Please confirm starlight-kit shipping and availability.">860★ — $300</option>
+                    <option data-details="Interested in the 1,100-star take-home starlight kit ($350). Please confirm starlight-kit shipping and availability.">1,100★ — $350</option>
+                  </select>
+                </label>
                 <div class="kit__foot">
                   <span class="kit__price">From $100</span>
-                  <button class="btn btn--gold btn--sm" type="button" data-kit="Fiber-optic starlight kit">Add to quote</button>
+                  <button class="btn btn--gold btn--sm" type="button" data-kit-quote>Add selected kit to quote</button>
                 </div>
               </div>
             </article>
-            <article class="kit">
+
+            <article class="kit kit--takehome">
               <div class="kit__visual kit__visual--ambient" aria-hidden="true"></div>
               <div class="kit__body">
-                <h3>RGB ambient lighting kit</h3>
-                <p>App- and remote-controlled strips for doors, dash, and footwells.</p>
-                <ul class="kit__tiers">
-                  <li><span>Basic — 6 strips (dash + doors)</span><span>$150 + shipping</span></li>
-                  <li><span>Premium — + 4 footwell lights</span><span>$250 + shipping</span></li>
-                  <li><span>Premium Plus — + speaker halos + door-storage LEDs</span><span>$350</span></li>
+                <span class="kit__tag">Take-home · product only</span>
+                <h3>RGB ambient lighting kits</h3>
+                <p class="kit__lede">App- and remote-controlled lighting for the dash, doors, footwells, speakers, and storage zones.</p>
+                <ul class="kit__tiers kit__tiers--ambient" aria-label="Take-home ambient lighting kit prices">
+                  <li><span><strong>Basic</strong> · 6 strips (2 dash + 1 per door)</span><span>$150 + shipping</span></li>
+                  <li><span><strong>Premium</strong> · Basic + 4 footwell lights</span><span>$250 + shipping</span></li>
+                  <li><span><strong>Premium Plus</strong> · Premium + 4 speaker-halo LEDs + 4 door-storage LEDs</span><span>$350</span></li>
                 </ul>
+                <label class="kit__picker">
+                  <span>Choose a take-home kit</span>
+                  <select data-kit-choice>
+                    <option data-details="Interested in the Basic take-home ambient kit ($150 + shipping): 6 strips (2 dash + 1 per door). Please confirm availability.">Basic — $150 + shipping</option>
+                    <option data-details="Interested in the Premium take-home ambient kit ($250 + shipping): 6 strips plus 4 footwell lights. Please confirm availability.">Premium — $250 + shipping</option>
+                    <option data-details="Interested in the Premium Plus take-home ambient kit ($350): 6 strips, 4 footwell lights, 4 speaker-halo LEDs, and 4 door-storage LEDs. Please confirm availability.">Premium Plus — $350</option>
+                  </select>
+                </label>
                 <div class="kit__foot">
                   <span class="kit__price">From $150</span>
-                  <button class="btn btn--gold btn--sm" type="button" data-kit="RGB ambient lighting kit">Add to quote</button>
+                  <button class="btn btn--gold btn--sm" type="button" data-kit-quote>Add selected kit to quote</button>
                 </div>
               </div>
             </article>
-            <article class="kit">
+
+            <article class="kit kit--addon">
               <div class="kit__visual kit__visual--meteor" aria-hidden="true"></div>
               <div class="kit__body">
+                <span class="kit__tag">Take-home add-on</span>
                 <h3>Shooting-star add-on</h3>
-                <p>Upgrade any starlight kit with animated meteor trails.</p>
+                <p>Upgrade a compatible starlight kit with animated meteor trails. Sergio has not confirmed this add-on&rsquo;s take-home price yet.</p>
                 <div class="kit__foot">
                   <span class="kit__price">Ask for pricing</span>
-                  <button class="btn btn--gold btn--sm" type="button" data-kit="Shooting-star add-on">Add to quote</button>
+                  <button class="btn btn--gold btn--sm" type="button" data-kit="take-home shooting-star add-on">Add to quote</button>
                 </div>
               </div>
             </article>
@@ -1309,14 +1339,14 @@
               </p>
               <!-- PRE-WIRED ONLINE BOOKING (2026-07-16, Sergio asked for booking confirmations).
                    TO GO LIVE (one-time, ~15 min): Sergio creates a free cal.com account, adds an
-                   "Install consult" event type + his availability (syncs to his Google Calendar),
+                   "Install consultation" event type + his availability (syncs to his Google Calendar),
                    then paste his link (e.g. https://cal.com/bayareaautocustomz/install) into
                    data-cal-link below. The button + modal appear automatically; customers pick a
                    real slot and BOTH sides get automatic email confirmations + reminders.
                    Empty link = button hidden, nothing changes. Same idiom as data-reviews-url. -->
               <div class="contact-strip" data-cal-link="">
                 <button class="contact-strip__item contact-strip__item--book" type="button" data-cal-open hidden>
-                  Book a slot online
+                  Book a consultation
                 </button>
                 <a class="contact-strip__item" href="tel:+19255365086">Call (925) 536-5086</a>
                 <a class="contact-strip__item" href="sms:+19255365086">Text us</a>
@@ -1363,7 +1393,7 @@
                   <option>Exterior lighting</option>
                   <option>Custom / Alcantara headliner</option>
                   <option>Butterfly doors</option>
-                  <option>DIY kit</option>
+                  <option>DIY take-home kit</option>
                   <option>Not sure yet</option>
                 </select>
               </label>
@@ -1502,7 +1532,7 @@
         <div class="chatbot__chips" data-chat-chips>
           <button class="chip" type="button" data-q="pricing">Pricing</button>
           <button class="chip" type="button" data-q="starlight">Starlights</button>
-          <button class="chip" type="button" data-q="kits">DIY kits</button>
+          <button class="chip" type="button" data-q="kits">Take-home kits</button>
           <button class="chip" type="button" data-q="doors">Butterfly doors</button>
           <button class="chip" type="button" data-q="booking">Booking</button>
         </div>
@@ -1513,14 +1543,16 @@
       </aside>
     </div>
 
-    <!-- Cal.com booking modal (inert until data-cal-link is set above) -->
-    <div class="calmodal" data-cal-modal hidden>
-      <div class="calmodal__backdrop" data-cal-close></div>
-      <div class="calmodal__panel" role="dialog" aria-modal="true" aria-label="Book an install slot">
-        <button class="calmodal__close" type="button" data-cal-close aria-label="Close booking">&times;</button>
-        <iframe class="calmodal__frame" data-cal-frame title="Pick a time — Bay Area Auto Customz" loading="lazy"></iframe>
+    <!-- Cal.com consultation dialog (inert until data-cal-link is set above) -->
+    <dialog class="calmodal" data-cal-modal aria-labelledby="calmodal-title">
+      <div class="calmodal__panel">
+        <div class="calmodal__head">
+          <strong id="calmodal-title">Book an install consultation</strong>
+          <button class="calmodal__close" type="button" data-cal-close aria-label="Close consultation booking">&times;</button>
+        </div>
+        <iframe class="calmodal__frame" data-cal-frame title="Book an install consultation with Bay Area Auto Customz" loading="lazy"></iframe>
       </div>
-    </div>
+    </dialog>
 
     <script src="app.js"></script>
   </body>

@@ -175,9 +175,15 @@
     };
     const ROOFS = {
       none: [],
-      regular: [roofRect(0.38, 0.24, 0.46)],
-      dual: [roofRect(0.56, 0.2, 0.42), roofRect(0.16, 0.2, 0.42)], // front + rear panels
-      pano: [roofRect(0.2, 0.58, 0.6)], // one wide span, most of the roof
+      regular: [roofRect(0.55, 0.28, 0.46)],
+      dual: [roofRect(0.18, 0.27, 0.46), roofRect(0.55, 0.27, 0.46)],
+      pano: [roofRect(0.17, 0.66, 0.6)],
+    };
+    const ROOF_LABELS = {
+      none: "No sunroof",
+      regular: "Regular sunroof",
+      dual: "Dual sunroof",
+      pano: "Panoramic roof",
     };
     const roofRects = () => ROOFS[state.roof] || [];
 
@@ -260,6 +266,7 @@
       twinkle: $("[data-twinkle]"),
       shooting: $("[data-shooting]"),
       roofBtns: $$("[data-roof]"),
+      roofStatus: $("[data-roof-status]"),
       designTools: $("[data-design-tools]"),
     };
 
@@ -327,6 +334,15 @@
       for (const R of roofRects()) if (inRoundRect(p, R)) return false;
       for (const R of HARDWARE) if (inRoundRect(p, R)) return false;
       return true;
+    }
+
+    function defaultInstallPoint() {
+      const candidates = [
+        { x: PANEL.x + PANEL.w * 0.1, y: PANEL.cy },
+        { x: PANEL.cx, y: PANEL.y + PANEL.h * 0.1 },
+        { x: PANEL.cx, y: PANEL.y + PANEL.h * 0.9 },
+      ];
+      return candidates.find((p) => insidePanel(p)) || { x: PANEL.x + PANEL.r, y: PANEL.cy };
     }
 
     function makeStar(p, opts = {}) {
@@ -441,7 +457,7 @@
       return clip(-dx, a.x - left) && clip(dx, right - a.x) && clip(-dy, a.y - top) && clip(dy, bottom - a.y);
     }
 
-    function trailHitsSunroof(trail) {
+    function trailHitsRoofGlass(trail) {
       const rects = roofRects();
       if (!rects.length) return false;
       const length = Math.hypot(trail.dx, trail.dy) || 1;
@@ -491,7 +507,7 @@
         let trail = null;
         for (let tries = 0; tries < 48; tries += 1) {
           const candidate = makeShootingTrail();
-          if (!trailHitsSunroof(candidate)) {
+          if (!trailHitsRoofGlass(candidate)) {
             trail = candidate;
             break;
           }
@@ -925,14 +941,14 @@
       if (KB_MOVES[ev.key]) {
         ev.preventDefault();
         const step = ev.shiftKey ? 56 : 14;
-        const c = state.kbCursor || { x: PANEL.cx, y: PANEL.y + PANEL.h * 0.75 };
+        const c = state.kbCursor || defaultInstallPoint();
         c.x = clamp(c.x + KB_MOVES[ev.key][0] * step, PANEL.x, PANEL.x + PANEL.w);
         c.y = clamp(c.y + KB_MOVES[ev.key][1] * step, PANEL.y, PANEL.y + PANEL.h);
         state.kbCursor = c;
         requestRender();
       } else if (ev.key === "Enter" || ev.key === " ") {
         ev.preventDefault();
-        if (!state.kbCursor) state.kbCursor = { x: PANEL.cx, y: PANEL.y + PANEL.h * 0.75 };
+        if (!state.kbCursor) state.kbCursor = defaultInstallPoint();
         state.lastPoint = null; // keyboard placement never draws paint lines
         if (state.tool === "erase") {
           eraseAt(state.kbCursor);
@@ -1042,24 +1058,30 @@
     }
     els.roofBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
+        const hadKitPreview = state.mode === "kit" && state.lastKitCount && state.stars.length > 0;
         els.roofBtns.forEach((b) => b.classList.toggle("is-active", b === btn));
         state.roof = btn.dataset.roof;
-        baseReady = false; // re-bake the panel for the new glass layout
-        // drop any stars — and their constellation lines — now under the sunroof
-        state.stars = state.stars.filter((s) => insidePanel(s));
-        state.lines = state.lines.filter((l) => insidePanel({ x: l.x1, y: l.y1 }) && insidePanel({ x: l.x2, y: l.y2 }));
-        // Only re-lay a kit that's actually on the canvas (same guard as the
-        // pattern buttons) — otherwise toggling the sunroof would resurrect a
-        // cleared kit or wipe hand-placed additions.
-        if (state.mode === "kit" && state.lastKitCount && state.stars.length) {
-          fillKit(state.lastKitCount);
-        } else {
-          fieldDirty = true;
-        }
-        // Existing meteor paths may have been valid without glass. Rebuild
-        // them for the current roof so Design mode and kit previews stay safe.
+        baseReady = false;
+        state.stars = state.stars.filter((star) => insidePanel(star));
+        state.lines = state.lines.filter((line) => insidePanel({ x: line.x1, y: line.y1 }) && insidePanel({ x: line.x2, y: line.y2 }));
+        if (hadKitPreview) fillKit(state.lastKitCount);
+        else fieldDirty = true;
+        if (state.kbCursor && !insidePanel(state.kbCursor)) state.kbCursor = defaultInstallPoint();
         if (els.shooting && els.shooting.checked) addShootingStars();
         else state.trails = [];
+
+        const roofLabel = ROOF_LABELS[state.roof] || ROOF_LABELS.regular;
+        if (els.roofStatus) {
+          els.roofStatus.textContent =
+            state.roof === "none"
+              ? "No sunroof selected. Stars can fill the full fabric area."
+              : roofLabel + " selected. Stars and shooting trails avoid the glass.";
+        }
+        canvas.setAttribute(
+          "aria-label",
+          "Starlight headliner preview with " + roofLabel.toLowerCase() +
+            " selected. Use the kit-size buttons to preview star density. In design mode, use the arrow keys to move the cursor and Enter to place or erase a star."
+        );
         update();
       });
     });
@@ -1127,12 +1149,13 @@
     window.__bacStudio = {
       summary() {
         const n = state.stars.length;
-        if (!n) return null;
         return {
           stars: n,
-          kit: closestKit(n),
+          kit: n ? closestKit(n) : null,
           color: state.color,
           shooting: state.trails.length > 0,
+          roof: state.roof,
+          roofLabel: ROOF_LABELS[state.roof] || ROOF_LABELS.regular,
         };
       },
       preset(kind) {
@@ -1154,7 +1177,7 @@
     // Mirror the visual "is-active" selection to assistive tech as aria-pressed,
     // so screen-reader users know which kit / pattern / color is chosen. One
     // observer per control keeps it in sync no matter which handler flips it.
-    $$("[data-mode],[data-kit-count],[data-tool],[data-pattern],[data-color]").forEach((btn) => {
+    $$("[data-mode],[data-kit-count],[data-tool],[data-pattern],[data-color],[data-roof]").forEach((btn) => {
       const sync = () => btn.setAttribute("aria-pressed", btn.classList.contains("is-active") ? "true" : "false");
       sync();
       new MutationObserver(sync).observe(btn, { attributes: true, attributeFilter: ["class"] });
@@ -1498,7 +1521,7 @@
 
   const vehicleField = bookingForm ? bookingForm.querySelector('[name="vehicle"]') : null;
 
-  function prefillBooking({ service, details, vehicle, scroll, focus } = {}) {
+  function prefillBooking({ service, details, vehicle, scroll, focus, replaceDetails = false } = {}) {
     if (service && serviceSelect) {
       const opt = $$("option", serviceSelect).find((o) => o.value === service || o.textContent === service);
       if (opt) serviceSelect.value = opt.value;
@@ -1507,7 +1530,7 @@
       vehicleField.value = vehicle;
     }
     if (details && detailsField) {
-      detailsField.value = detailsField.value ? `${detailsField.value}\n${details}` : details;
+      detailsField.value = replaceDetails || !detailsField.value ? details : `${detailsField.value}\n${details}`;
     }
     if (scroll) {
       const book = $("#book");
@@ -1630,18 +1653,34 @@
     });
   }
 
-  /* ============================ DIY KITS =============================== */
-  $$("[data-kit]").forEach((btn) => {
+  /* ====================== TAKE-HOME DIY KITS ========================== */
+  $$("[data-kit-quote]").forEach((btn) => {
     btn.addEventListener("click", () => {
+      const card = btn.closest(".kit");
+      const picker = card ? $("[data-kit-choice]", card) : null;
+      const option = picker ? picker.options[picker.selectedIndex] : null;
+      if (!option || !option.dataset.details) return;
       prefillBooking({
-        service: "DIY kit",
-        details: `Interested in the ${btn.dataset.kit}.`,
+        service: "DIY take-home kit",
+        details: option.dataset.details,
+        replaceDetails: true,
         scroll: true,
         focus: true,
       });
     });
   });
 
+  $$("[data-kit]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      prefillBooking({
+        service: "DIY take-home kit",
+        details: "Interested in the " + btn.dataset.kit + ". Please confirm price and availability.",
+        replaceDetails: true,
+        scroll: true,
+        focus: true,
+      });
+    });
+  });
   /* ============================ LIGHTBOX ================================ */
   // Every .media-zoom button (gallery tiles, shop shots, ambient photos)
   // opens its photo full-screen, with prev/next + keyboard navigation.
@@ -1779,9 +1818,9 @@
 
   const ANSWERS = {
     greeting:
-      "Hey! I can help with starlight headliners, shooting stars, interior & exterior lighting, custom headliners, butterfly doors, and DIY kits — plus pricing and booking. What are you thinking about?",
+      "Hey! I can help with starlight headliners, shooting stars, interior & exterior lighting, custom headliners, butterfly doors, and take-home DIY kits — plus pricing and booking. What are you thinking about?",
     pricing:
-      `Most work is custom-quoted by vehicle and the look you want — a starlight headliner depends on the star count (we start at a 300-star kit and go up to 4,400; try the designer above to preview any size), and lighting or butterfly doors are quoted per build. Send your vehicle and the look and we'll get you an exact number. Call or text ${BUSINESS.phone}.`,
+      `Installed work is priced separately by vehicle and build. Take-home starlight kits are $100–$350 for 300–1,100 stars. Take-home ambient kits are Basic $150 + shipping, Premium $250 + shipping, and Premium Plus $350. The shooting-star take-home add-on is still ask-for-pricing. Call or text ${BUSINESS.phone} for availability.`,
     starlight:
       "Starlight headliners are our specialty — individual fiber-optic stars in purple, ice white, blue, or an RGB mix, with custom density and patterns. Kits start at 300 stars and go up to 4,400. Use the designer above to preview a size on a real headliner shape, or plot your own constellation, then hit \"Use this design for my quote.\"",
     shooting:
@@ -1795,7 +1834,7 @@
     doors:
       "Yes — we do butterfly (vertical) door conversions, installed clean and reliable. Send your vehicle and we'll let you know fitment and pricing.",
     kits:
-      "We sell DIY kits too: a fiber-optic starlight kit, an RGB ambient lighting kit (16M colors, 200+ modes, music sync, app + remote), and a shooting-star add-on — each with the LED engine, fibers/strips, remote, and a setup guide. See the Ambient lighting kits and DIY kits sections, or tell me your vehicle and I'll point you to the right one.",
+      "Take-home starlight kits are 300★ $100, 400★ $130, 500★ $180, 650★ $200, 750★ $250, 860★ $300, and 1,100★ $350; ask us to confirm starlight-kit shipping. Ambient take-home kits are Basic $150 + shipping (6 strips), Premium $250 + shipping (6 strips + 4 footwell lights), and Premium Plus $350 (those lights + 4 speaker halos + 4 door-storage LEDs). The shooting-star add-on is still ask-for-pricing.",
     booking:
       `Booking is easy: use the quote form on this page, or call/text ${BUSINESS.phone}. You can also DM us on Instagram (@bayareaautocustomz). Tell us your vehicle, the look you want, and timing, and we'll confirm a quote and an install date.`,
     location:
@@ -1891,15 +1930,15 @@
     exterior: "Exterior lighting",
     headliner: "Custom / Alcantara headliner",
     doors: "Butterfly doors",
-    kits: "DIY kit",
+    kits: "DIY take-home kit",
   };
 
   function classify(textRaw) {
     const t = ` ${singularize(normalizeText(textRaw))} `;
     const has = (re) => re.test(t);
+    if (has(/\b(kit|diy|ship|shipping|buy|purchase|order)\b/)) return "kits";
     if (has(/\b(price|pricing|cost|quote|how much|expensive|deposit|pay)\b/)) return "pricing";
     if (has(/\b(book|booking|appointment|schedule|reserve|install date|contact|call|text)\b/)) return "booking";
-    if (has(/\b(kit|diy|ship|shipping|buy|purchase|order)\b/)) return "kits";
     if (has(/\b(butterfly|lambo|vertical|suicide) ?door\b|\bbutterfly\b/)) return "doors";
     if (has(/\b(shoot\w* star|meteor|falling star)\b/)) return "shooting";
     if (has(/\b(exterior|underglow|under glow|outside)\b/)) return "exterior";
@@ -1918,13 +1957,13 @@
   function detectService(textRaw) {
     const t = ` ${singularize(normalizeText(textRaw))} `;
     const has = (re) => re.test(t);
+    if (has(/\b(kit|diy)\b/)) return "kits";
     if (has(/\b(butterfly|lambo|vertical|suicide) ?door\b|\bbutterfly\b/)) return "doors";
     if (has(/\b(shoot\w* star|meteor|falling star)\b/)) return "shooting";
     if (has(/\b(exterior|underglow|under glow)\b/)) return "exterior";
     if (has(/\b(alcantara|suede|reupholster|re upholster)\b/)) return "headliner";
     if (has(/\b(interior|ambient|footwell|door light\w*|dash light\w*|led strip)\b/)) return "interior";
     if (has(/\b(star|starlight|starlit|fiber|fibre|headliner|twinkle|ceiling|night sky)\b/)) return "starlight";
-    if (has(/\b(kit|diy)\b/)) return "kits";
     return null;
   }
 
@@ -2011,18 +2050,25 @@
   if (quoteBtn) {
     quoteBtn.addEventListener("click", () => {
       const s = window.__bacStudio && window.__bacStudio.summary();
-      if (!s) {
-        prefillBooking({ service: "Starlight headliner", scroll: true, focus: true });
+      if (!s || !s.stars) {
+        prefillBooking({
+          service: "Starlight headliner",
+          details: "Starlight design request: " + (s ? s.roofLabel : "Regular sunroof") + ". I need help choosing a star count.",
+          replaceDetails: true,
+          scroll: true,
+          focus: true,
+        });
         return;
       }
       const colorLabel = s.color === "rgb" ? "RGB mix" : s.color;
       const det =
-        `My starlight design: ${fmt(s.stars)} stars (~${fmt(s.kit)}-star kit), ${colorLabel} color` +
+        `My starlight design: ${fmt(s.stars)} stars (~${fmt(s.kit)}-star kit), ${colorLabel} color, ${s.roofLabel}` +
         (s.shooting ? ", with shooting stars." : ".") +
         " I can text or DM the saved preview PNG.";
       prefillBooking({
         service: s.shooting ? "Starlight + shooting stars" : "Starlight headliner",
         details: det,
+        replaceDetails: true,
         scroll: true,
         focus: true,
       });
@@ -2034,39 +2080,51 @@
     return str.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
-  /* ------------------------------ online booking (Cal.com, pre-wired) ------
-     Inert until data-cal-link is filled on the contact strip (same idiom as
-     data-reviews-url). With a link set: the "Book a slot online" button shows,
-     and opens Sergio's Cal.com page in an in-page modal (CSP frame-src already
-     scoped to cal.com). Customers pick a slot; Cal.com emails confirmations +
-     reminders to BOTH sides — the booking-confirmation ask, no backend needed. */
-  (function bookingModal() {
+  /* -------------------------- online consultation (Cal.com, pre-wired) ---
+     Inert until Sergio's Cal.com event link is placed in data-cal-link.
+     A configured link opens in a native modal dialog; Cal.com handles the
+     customer/Sergio confirmation emails and reminders. */
+  (function bookingDialog() {
     const strip = document.querySelector("[data-cal-link]");
-    const link = (strip && strip.dataset.calLink ? strip.dataset.calLink : "").trim();
+    const rawLink = (strip && strip.dataset.calLink ? strip.dataset.calLink : "").trim();
     const btn = document.querySelector("[data-cal-open]");
     const modal = document.querySelector("[data-cal-modal]");
     const frame = document.querySelector("[data-cal-frame]");
-    if (!link || !btn || !modal || !frame) return; // not configured yet — stay invisible
+    const closeBtn = modal ? modal.querySelector("[data-cal-close]") : null;
+    if (!rawLink || !btn || !modal || !frame || !closeBtn || typeof modal.showModal !== "function") return;
+
+    let calUrl;
+    try {
+      calUrl = new URL(rawLink);
+      if (!["cal.com", "app.cal.com"].includes(calUrl.hostname.toLowerCase())) return;
+    } catch {
+      return;
+    }
+
     let loaded = false;
     btn.hidden = false;
     const open = () => {
       if (!loaded) {
-        // embed=true renders Cal.com's chrome-less embed layout in the iframe
-        frame.src = link + (link.includes("?") ? "&" : "?") + "embed=true";
+        calUrl.searchParams.set("embed", "true");
+        frame.src = calUrl.toString();
         loaded = true;
       }
-      modal.hidden = false;
+      modal.showModal();
       document.body.style.overflow = "hidden";
+      requestAnimationFrame(() => closeBtn.focus());
     };
     const close = () => {
-      modal.hidden = true;
+      if (modal.open) modal.close();
+    };
+
+    btn.addEventListener("click", open);
+    closeBtn.addEventListener("click", close);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) close();
+    });
+    modal.addEventListener("close", () => {
       document.body.style.overflow = "";
       btn.focus();
-    };
-    btn.addEventListener("click", open);
-    modal.querySelectorAll("[data-cal-close]").forEach((el) => el.addEventListener("click", close));
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !modal.hidden) close();
     });
   })();
 })();

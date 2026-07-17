@@ -1582,7 +1582,7 @@ img.tile__media {
 
 .kits {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.1rem;
 }
 
@@ -2771,25 +2771,126 @@ img.tile__media {
   }
 }
 
-/* DIY kit tier lists (Sergio's take-home prices, 2026-07-16) */
+/* Sergio-confirmed take-home kit details */
+.chips--roof {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.kit__tag {
+  display: inline-flex;
+  margin-bottom: 0.65rem;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid rgba(255, 221, 138, 0.2);
+  border-radius: 999px;
+  color: var(--gold-bright);
+  background: rgba(255, 221, 138, 0.055);
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.kit__lede {
+  margin-bottom: 1rem;
+}
+
+.kit__specs {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0 0 1rem;
+}
+
+.kit__specs p {
+  margin: 0;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid rgba(255, 221, 138, 0.1);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.025);
+  line-height: 1.5;
+}
+
+.kit__specs strong {
+  display: block;
+  margin-bottom: 0.16rem;
+  color: var(--ink);
+}
+
 .kit__tiers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.42rem 1rem;
   list-style: none;
-  margin: 10px 0 2px;
+  margin: 0 0 1rem;
   padding: 0;
   font-size: 0.84rem;
 }
+
 .kit__tiers li {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  padding: 4px 0;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.48rem 0;
   border-bottom: 1px dashed rgba(214, 178, 110, 0.14);
-  color: var(--muted, #b8b3a8);
+  color: var(--muted);
 }
-.kit__tiers li:last-child { border-bottom: 0; }
-.kit__tiers li span:last-child { color: var(--gold, #d6b26e); font-weight: 600; white-space: nowrap; }
 
-/* Cal.com booking modal (pre-wired; hidden until data-cal-link is set) */
+.kit__tiers li > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.kit__tiers li > span:last-child {
+  flex: 0 0 auto;
+  color: var(--gold);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.kit__tiers--ambient {
+  grid-template-columns: 1fr;
+}
+
+.kit__picker {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.95rem 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.kit__picker select {
+  width: 100%;
+  min-height: 2.9rem;
+  padding: 0.7rem 2.4rem 0.7rem 0.8rem;
+  border: 1px solid rgba(255, 221, 138, 0.25);
+  border-radius: 0.8rem;
+  background: #14130f;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.88rem;
+}
+
+.kit__picker select:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 2px;
+}
+
+.kit--addon {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(15rem, 0.7fr) minmax(0, 1.3fr);
+}
+
+.kit--addon .kit__visual {
+  height: auto;
+  min-height: 12rem;
+  border-right: 1px solid var(--line-soft);
+  border-bottom: 0;
+}
+
+/* Cal.com consultation dialog: native <dialog> supplies focus containment. */
 .contact-strip__item--book {
   background: linear-gradient(180deg, #e9c98a, #d6b26e);
   color: #241a08;
@@ -2797,24 +2898,105 @@ img.tile__media {
   font-weight: 700;
   cursor: pointer;
 }
-.calmodal { position: fixed; inset: 0; z-index: 120; }
-.calmodal__backdrop { position: absolute; inset: 0; background: rgba(4, 4, 6, 0.82); }
-.calmodal__panel {
-  position: relative;
-  margin: 4vh auto;
+
+.calmodal {
   width: min(960px, 94vw);
-  height: 88vh;
-  background: #0b0b0f;
+  max-width: none;
+  height: min(88vh, 840px);
+  max-height: none;
+  padding: 0;
   border: 1px solid rgba(214, 178, 110, 0.25);
   border-radius: 16px;
+  background: #0b0b0f;
+  color: var(--ink);
   overflow: hidden;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
 }
-.calmodal__frame { width: 100%; height: 100%; border: 0; background: #fff; }
+
+.calmodal:not([open]) {
+  display: none;
+}
+
+.calmodal::backdrop {
+  background: rgba(4, 4, 6, 0.84);
+  backdrop-filter: blur(4px);
+}
+
+.calmodal__panel {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+}
+
+.calmodal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3.4rem;
+  padding: 0.55rem 0.7rem 0.55rem 1rem;
+  border-bottom: 1px solid rgba(214, 178, 110, 0.2);
+}
+
+.calmodal__frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+
 .calmodal__close {
-  position: absolute; top: 10px; right: 12px; z-index: 2;
-  width: 38px; height: 38px; border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
   border: 1px solid rgba(214, 178, 110, 0.4);
-  background: rgba(10, 10, 14, 0.85); color: #e9c98a;
-  font-size: 22px; line-height: 1; cursor: pointer;
+  border-radius: 50%;
+  background: rgba(10, 10, 14, 0.85);
+  color: #e9c98a;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.calmodal__close:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 2px;
+}
+
+@media (max-width: 680px) {
+  .kit--addon {
+    display: block;
+  }
+
+  .kit--addon .kit__visual {
+    height: 9rem;
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .kit__tiers {
+    grid-template-columns: 1fr;
+  }
+
+  .kit__tiers li {
+    align-items: flex-start;
+  }
+
+  .kit__foot {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .kit__foot .btn {
+    width: 100%;
+  }
+
+  .calmodal {
+    width: 96vw;
+    height: 92vh;
+    border-radius: 12px;
+  }
 }
