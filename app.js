@@ -684,14 +684,20 @@
 
     // Bake the whole static star field once; refresh only when stars change.
     function renderField() {
-      fctx.clearRect(0, 0, W, H);
-      fctx.globalCompositeOperation = "lighter";
-      for (const st of state.stars) drawStar(fctx, st, (0.4 + st.baseA * 0.55) * state.alphaScale);
-      fctx.globalCompositeOperation = "source-over";
-      fctx.globalAlpha = 1;
+      // Pick the animated subset FIRST and leave it OUT of the static bake — twinkle is a
+      // dim-and-brighten cycle, and a star baked bright underneath can never visibly dim
+      // (the 850★+ "stars don't twinkle" bug, reported by Sergio 2026-07-17).
       const cap = 160;
       const step = Math.max(1, Math.floor(state.stars.length / cap));
       state.twinkleStars = state.stars.filter((_, idx) => idx % step === 0).slice(0, cap);
+      const animated = new Set(state.twinkleStars);
+      fctx.clearRect(0, 0, W, H);
+      fctx.globalCompositeOperation = "lighter";
+      for (const st of state.stars) {
+        if (!animated.has(st)) drawStar(fctx, st, (0.4 + st.baseA * 0.55) * state.alphaScale);
+      }
+      fctx.globalCompositeOperation = "source-over";
+      fctx.globalAlpha = 1;
       fieldDirty = false;
     }
 
@@ -775,9 +781,12 @@
         if (fieldDirty) renderField();
         ctx.globalAlpha = 1;
         ctx.drawImage(field, 0, 0);
-        if (!reduceMotion && state.twinkle > 0 && state.twinkleStars) {
+        if (state.twinkleStars) {
+          const animate = !reduceMotion && state.twinkle > 0;
           for (const st of state.twinkleStars) {
-            const a = clamp(0.12 + Math.sin(time * speed + st.phase) * 0.5, 0, 0.8);
+            const a = animate
+              ? clamp(0.55 + Math.sin(time * speed + st.phase) * st.pulse, 0.18, 1)
+              : (0.4 + st.baseA * 0.55) * state.alphaScale; // static fill — no holes in the field
             drawStar(ctx, st, a);
           }
         }
