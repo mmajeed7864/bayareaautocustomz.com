@@ -2033,4 +2033,40 @@
   function escapeHtml(str) {
     return str.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
+
+  /* ------------------------------ online booking (Cal.com, pre-wired) ------
+     Inert until data-cal-link is filled on the contact strip (same idiom as
+     data-reviews-url). With a link set: the "Book a slot online" button shows,
+     and opens Sergio's Cal.com page in an in-page modal (CSP frame-src already
+     scoped to cal.com). Customers pick a slot; Cal.com emails confirmations +
+     reminders to BOTH sides — the booking-confirmation ask, no backend needed. */
+  (function bookingModal() {
+    const strip = document.querySelector("[data-cal-link]");
+    const link = (strip && strip.dataset.calLink ? strip.dataset.calLink : "").trim();
+    const btn = document.querySelector("[data-cal-open]");
+    const modal = document.querySelector("[data-cal-modal]");
+    const frame = document.querySelector("[data-cal-frame]");
+    if (!link || !btn || !modal || !frame) return; // not configured yet — stay invisible
+    let loaded = false;
+    btn.hidden = false;
+    const open = () => {
+      if (!loaded) {
+        // embed=true renders Cal.com's chrome-less embed layout in the iframe
+        frame.src = link + (link.includes("?") ? "&" : "?") + "embed=true";
+        loaded = true;
+      }
+      modal.hidden = false;
+      document.body.style.overflow = "hidden";
+    };
+    const close = () => {
+      modal.hidden = true;
+      document.body.style.overflow = "";
+      btn.focus();
+    };
+    btn.addEventListener("click", open);
+    modal.querySelectorAll("[data-cal-close]").forEach((el) => el.addEventListener("click", close));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !modal.hidden) close();
+    });
+  })();
 })();

@@ -10,7 +10,7 @@
          style="" positioning attrs; img/connect allow any https for feed media. -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self'; connect-src 'self' https:; base-uri 'self'"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self'; frame-src https://cal.com https://app.cal.com; connect-src 'self' https:; base-uri 'self'"
     />
 
     <title>Bay Area Auto Customz | Starlight Headliners &amp; Custom Auto Lighting</title>
@@ -1307,7 +1307,17 @@
                 Tell us the vehicle and the look you want. We&rsquo;ll reply with a quote and the
                 next available install date. Prefer to talk? Call or text any time.
               </p>
-              <div class="contact-strip">
+              <!-- PRE-WIRED ONLINE BOOKING (2026-07-16, Sergio asked for booking confirmations).
+                   TO GO LIVE (one-time, ~15 min): Sergio creates a free cal.com account, adds an
+                   "Install consult" event type + his availability (syncs to his Google Calendar),
+                   then paste his link (e.g. https://cal.com/bayareaautocustomz/install) into
+                   data-cal-link below. The button + modal appear automatically; customers pick a
+                   real slot and BOTH sides get automatic email confirmations + reminders.
+                   Empty link = button hidden, nothing changes. Same idiom as data-reviews-url. -->
+              <div class="contact-strip" data-cal-link="">
+                <button class="contact-strip__item contact-strip__item--book" type="button" data-cal-open hidden>
+                  Book a slot online
+                </button>
                 <a class="contact-strip__item" href="tel:+19255365086">Call (925) 536-5086</a>
                 <a class="contact-strip__item" href="sms:+19255365086">Text us</a>
                 <a class="contact-strip__item" href="https://www.instagram.com/bayareaautocustomz/" target="_blank" rel="noopener">DM Instagram</a>
@@ -1501,6 +1511,15 @@
           <button type="submit" aria-label="Send">Send</button>
         </form>
       </aside>
+    </div>
+
+    <!-- Cal.com booking modal (inert until data-cal-link is set above) -->
+    <div class="calmodal" data-cal-modal hidden>
+      <div class="calmodal__backdrop" data-cal-close></div>
+      <div class="calmodal__panel" role="dialog" aria-modal="true" aria-label="Book an install slot">
+        <button class="calmodal__close" type="button" data-cal-close aria-label="Close booking">&times;</button>
+        <iframe class="calmodal__frame" data-cal-frame title="Pick a time — Bay Area Auto Customz" loading="lazy"></iframe>
+      </div>
     </div>
 
     <script src="app.js"></script>
