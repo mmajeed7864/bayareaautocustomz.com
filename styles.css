@@ -2770,3 +2770,21 @@ img.tile__media {
     grid-template-columns: 1fr;
   }
 }
+
+/* DIY kit tier lists (Sergio's take-home prices, 2026-07-16) */
+.kit__tiers {
+  list-style: none;
+  margin: 10px 0 2px;
+  padding: 0;
+  font-size: 0.84rem;
+}
+.kit__tiers li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  border-bottom: 1px dashed rgba(214, 178, 110, 0.14);
+  color: var(--muted, #b8b3a8);
+}
+.kit__tiers li:last-child { border-bottom: 0; }
+.kit__tiers li span:last-child { color: var(--gold, #d6b26e); font-weight: 600; white-space: nowrap; }

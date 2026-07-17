@@ -163,11 +163,23 @@
     // Orientation: the car runs left-to-right — REAR on the left, FRONT on the
     // right (matching Sergio's diagram). So the windshield hardware lives on the
     // right edge and the grab handles sit on the top/bottom (the door sides).
-    // Sunroof glass panel toward the front (right) — no stars land here.
-    const SUNROOF = { w: PANEL.w * 0.24, h: PANEL.h * 0.46 };
-    SUNROOF.x = PANEL.x + PANEL.w * 0.38;
-    SUNROOF.y = PANEL.cy - SUNROOF.h / 2;
-    SUNROOF.r = Math.min(SUNROOF.w, SUNROOF.h) * 0.12;
+    // Sunroof glass — no stars land on glass. Sergio's request (2026-07-16): customers
+    // pick their real roof: none / regular / dual / panoramic. Each type is a set of
+    // star-free glass rects; "regular" keeps the original single-panel geometry.
+    const roofRect = (xFrac, wFrac, hFrac) => {
+      const R = { w: PANEL.w * wFrac, h: PANEL.h * hFrac };
+      R.x = PANEL.x + PANEL.w * xFrac;
+      R.y = PANEL.cy - R.h / 2;
+      R.r = Math.min(R.w, R.h) * 0.12;
+      return R;
+    };
+    const ROOFS = {
+      none: [],
+      regular: [roofRect(0.38, 0.24, 0.46)],
+      dual: [roofRect(0.56, 0.2, 0.42), roofRect(0.16, 0.2, 0.42)], // front + rear panels
+      pano: [roofRect(0.2, 0.58, 0.6)], // one wide span, most of the roof
+    };
+    const roofRects = () => ROOFS[state.roof] || [];
 
     // The rest of a real headliner's hardware — two sun visors + the overhead
     // map-light console at the front (right edge), grab handles on the door
@@ -182,7 +194,7 @@
     const CONSOLE = featRect(0.885, 0.455, 0.055, 0.09, 0.3); // overhead map light (front-center)
     const HANDLE_TOP = featRect(0.27, 0.02, 0.085, 0.03, 0.5); // grab handles above the doors
     const HANDLE_BOT = featRect(0.27, 0.93, 0.085, 0.03, 0.5);
-    // Always-present hardware (the sunroof is optional — see state.sunroof).
+    // Always-present hardware (glass layout is roof-type dependent — see state.roof).
     const HARDWARE = [VISOR_TR, VISOR_BR, CONSOLE, HANDLE_TOP, HANDLE_BOT];
 
     // Draw hundreds–thousands of stars smoothly by baking the static field to
@@ -222,7 +234,7 @@
     function clipInstallSurface(c) {
       c.beginPath();
       addRoundRect(c, PANEL);
-      if (state.sunroof) addRoundRect(c, SUNROOF);
+      roofRects().forEach((R) => addRoundRect(c, R));
       HARDWARE.forEach((R) => addRoundRect(c, R));
       c.clip("evenodd");
     }
@@ -247,7 +259,7 @@
       size: $("[data-size]"),
       twinkle: $("[data-twinkle]"),
       shooting: $("[data-shooting]"),
-      sunroof: $("[data-sunroof]"),
+      roofBtns: $$("[data-roof]"),
       designTools: $("[data-design-tools]"),
     };
 
@@ -265,7 +277,7 @@
       twinkle: Number(els.twinkle ? els.twinkle.value : 55),
       sizeScale: 1, // shrinks stars as density rises so they read as pinpoints
       alphaScale: 1, // eases brightness at high density so it doesn't blow out
-      sunroof: els.sunroof ? els.sunroof.checked : true, // toggle the sunroof cut-out
+      roof: "regular", // "none" | "regular" | "dual" | "pano" — star-free glass layout
       vehicle: "std", // "std" | "ev" — which price table the estimate uses
       kbCursor: null, // keyboard-placement cursor (design mode)
       painting: false,
@@ -312,7 +324,7 @@
 
     function insidePanel(p) {
       if (!inRoundRect(p, PANEL)) return false;
-      if (state.sunroof && inRoundRect(p, SUNROOF)) return false;
+      for (const R of roofRects()) if (inRoundRect(p, R)) return false;
       for (const R of HARDWARE) if (inRoundRect(p, R)) return false;
       return true;
     }
@@ -430,16 +442,14 @@
     }
 
     function trailHitsSunroof(trail) {
-      if (!state.sunroof) return false;
+      const rects = roofRects();
+      if (!rects.length) return false;
       const length = Math.hypot(trail.dx, trail.dy) || 1;
       const ux = trail.dx / length;
       const uy = trail.dy / length;
-      return segmentHitsRect(
-        { x: trail.x0 - ux * trail.tail, y: trail.y0 - uy * trail.tail },
-        { x: trail.x0 + trail.dx, y: trail.y0 + trail.dy },
-        SUNROOF,
-        12
-      );
+      const a = { x: trail.x0 - ux * trail.tail, y: trail.y0 - uy * trail.tail };
+      const b = { x: trail.x0 + trail.dx, y: trail.y0 + trail.dy };
+      return rects.some((R) => segmentHitsRect(a, b, R, 12));
     }
 
     function makeShootingTrail() {
@@ -459,9 +469,13 @@
 
     function safeShootingTrail(index) {
       const above = index % 2 === 0;
+      // safe horizontal lanes above/below the glass (or around center with no sunroof)
+      const rects = roofRects();
+      const gTop = rects.length ? Math.min(...rects.map((R) => R.y)) : PANEL.cy - 20;
+      const gBot = rects.length ? Math.max(...rects.map((R) => R.y + R.h)) : PANEL.cy + 20;
       return {
         x0: PANEL.x + PANEL.w * 0.08,
-        y0: above ? SUNROOF.y - 20 : SUNROOF.y + SUNROOF.h + 20,
+        y0: above ? gTop - 20 : gBot + 20,
         dx: PANEL.w * 0.56,
         dy: 0,
         tail: 110 + index * 8,
@@ -583,10 +597,10 @@
       depth.addColorStop(1, "rgba(0, 0, 0, 0.32)");
       c.fillStyle = depth;
       c.fillRect(0, 0, W, H);
-      // sunroof glass panel (optional; kept star-free, like a real headliner)
-      if (state.sunroof) {
-        roundRectPath(c, SUNROOF);
-        const glass = c.createLinearGradient(SUNROOF.x, SUNROOF.y, SUNROOF.x, SUNROOF.y + SUNROOF.h);
+      // sunroof glass panel(s) (roof-type dependent; kept star-free, like a real headliner)
+      roofRects().forEach((GLASS) => {
+        roundRectPath(c, GLASS);
+        const glass = c.createLinearGradient(GLASS.x, GLASS.y, GLASS.x, GLASS.y + GLASS.h);
         glass.addColorStop(0, "#080b12");
         glass.addColorStop(1, "#03040a");
         c.fillStyle = glass;
@@ -594,7 +608,7 @@
         c.lineWidth = 2;
         c.strokeStyle = "rgba(150, 180, 220, 0.16)";
         c.stroke();
-      }
+      });
       // visors + overhead console (raised suede panels) and grab handles (slots)
       drawMolding(c, VISOR_TR, "raised");
       drawMolding(c, VISOR_BR, "raised");
@@ -1026,10 +1040,11 @@
         update();
       });
     }
-    if (els.sunroof) {
-      els.sunroof.addEventListener("change", () => {
-        state.sunroof = els.sunroof.checked;
-        baseReady = false; // re-bake the panel with / without the sunroof
+    els.roofBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        els.roofBtns.forEach((b) => b.classList.toggle("is-active", b === btn));
+        state.roof = btn.dataset.roof;
+        baseReady = false; // re-bake the panel for the new glass layout
         // drop any stars — and their constellation lines — now under the sunroof
         state.stars = state.stars.filter((s) => insidePanel(s));
         state.lines = state.lines.filter((l) => insidePanel({ x: l.x1, y: l.y1 }) && insidePanel({ x: l.x2, y: l.y2 }));
@@ -1047,7 +1062,7 @@
         else state.trails = [];
         update();
       });
-    }
+    });
 
     // mode toggle
     $$("[data-mode]").forEach((btn) => {

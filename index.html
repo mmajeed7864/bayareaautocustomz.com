@@ -361,10 +361,15 @@
                 <input type="range" min="0" max="100" value="55" data-twinkle />
               </label>
 
-              <label class="field toggle">
-                <input type="checkbox" data-sunroof checked />
-                <span>Sunroof</span>
-              </label>
+              <div class="field">
+                <span class="field__label">Roof type</span>
+                <div class="chips chips--roof" role="group" aria-label="Sunroof type">
+                  <button class="chip" type="button" data-roof="none">No sunroof</button>
+                  <button class="chip is-active" type="button" data-roof="regular">Regular</button>
+                  <button class="chip" type="button" data-roof="dual">Dual</button>
+                  <button class="chip" type="button" data-roof="pano">Panoramic</button>
+                </div>
+              </div>
 
               <label class="field toggle">
                 <input type="checkbox" data-shooting />
@@ -1189,8 +1194,9 @@
             </p>
           </div>
 
-          <!-- Kit prices read "Ask for pricing" until Sergio confirms real numbers.
-               Swap each .kit__price to the real "from $XX" once known. -->
+          <!-- Kit prices = Sergio's take-home list (email 2026-07-16). NOTE: kit tiers
+               genuinely include 750★ and 860★ — a DIFFERENT scale from the installed-service
+               tiers (850★); do not "normalize" them. Shooting-star add-on still unpriced. -->
           <div class="kits">
             <article class="kit">
               <div class="kit__visual kit__visual--fiber" aria-hidden="true">
@@ -1198,9 +1204,18 @@
               </div>
               <div class="kit__body">
                 <h3>Fiber-optic starlight kit</h3>
-                <p>LED engine, fiber bundle, remote, and a starter install guide.</p>
+                <p>LED engine, fiber bundle, remote, and a starter install guide. App + Bluetooth control, music-sync twinkle, RGBW color.</p>
+                <ul class="kit__tiers">
+                  <li><span>300★</span><span>$100</span></li>
+                  <li><span>400★</span><span>$130</span></li>
+                  <li><span>500★</span><span>$180</span></li>
+                  <li><span>650★</span><span>$200</span></li>
+                  <li><span>750★</span><span>$250</span></li>
+                  <li><span>860★</span><span>$300</span></li>
+                  <li><span>1,100★</span><span>$350</span></li>
+                </ul>
                 <div class="kit__foot">
-                  <span class="kit__price">Ask for pricing</span>
+                  <span class="kit__price">From $100</span>
                   <button class="btn btn--gold btn--sm" type="button" data-kit="Fiber-optic starlight kit">Add to quote</button>
                 </div>
               </div>
@@ -1210,8 +1225,13 @@
               <div class="kit__body">
                 <h3>RGB ambient lighting kit</h3>
                 <p>App- and remote-controlled strips for doors, dash, and footwells.</p>
+                <ul class="kit__tiers">
+                  <li><span>Basic — 6 strips (dash + doors)</span><span>$150 + shipping</span></li>
+                  <li><span>Premium — + 4 footwell lights</span><span>$250 + shipping</span></li>
+                  <li><span>Premium Plus — + speaker halos + door-storage LEDs</span><span>$350</span></li>
+                </ul>
                 <div class="kit__foot">
-                  <span class="kit__price">Ask for pricing</span>
+                  <span class="kit__price">From $150</span>
                   <button class="btn btn--gold btn--sm" type="button" data-kit="RGB ambient lighting kit">Add to quote</button>
                 </div>
               </div>
