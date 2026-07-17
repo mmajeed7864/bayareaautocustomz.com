@@ -1,10 +1,10 @@
 /* =========================================================================
    Bay Area Auto Customz — interactive site logic
-   - Starlight designer: preview kit sizes (300–4,000 fibers) on a real
+   - Starlight designer: preview kit sizes (300–4,400 fibers) on a real
      headliner shape in three layout patterns AND plot your own stars, in
      purple / white / blue / RGB, with shooting stars.
-   - Shop-video reel switcher, gallery lightbox, booking (no backend — opens
-     text/email prefilled), DIY-kit + service shortcuts, and an assistant
+   - Shop-video reel switcher, gallery lightbox, Formspree quote capture with
+     direct text/call/DM fallbacks, DIY-kit + service shortcuts, and an assistant
      that remembers your vehicle and can prefill the quote form.
    Built for Bay Area Auto Customz by Symbio AI.
    ========================================================================= */
@@ -24,7 +24,7 @@
     tiktok: "https://www.tiktok.com/@bayareaautocustomz",
   };
 
-  // Sergio's real kit sizes — 300-star minimum, up to 4,000.
+  // Sergio's real kit sizes — 300-star minimum, up to 4,400.
   const KIT_SIZES = [300, 400, 500, 650, 850, 1100, 1500, 2200, 2500, 3300, 3500, 4400];
 
   // Sergio's "starting at" install pricing (materials + hidden wiring install).
@@ -1505,7 +1505,7 @@
   }
 
   if (bookingForm && bookingOut) {
-    bookingForm.addEventListener("submit", (ev) => {
+    bookingForm.addEventListener("submit", async (ev) => {
       ev.preventDefault();
       const data = new FormData(bookingForm);
       const name = (data.get("name") || "").toString().trim();
@@ -1543,43 +1543,72 @@
       if (details) lines.push(`Details: ${details}`);
       const message = lines.join("\n");
       const enc = encodeURIComponent(message);
-      const smsHref = `sms:${BUSINESS.tel}?&body=${enc}`;
-
-      // Alert Sergio automatically: POST to Netlify Forms so he gets an email /
-      // text on every submission, even if the visitor never taps a send button.
-      // Best-effort — off Netlify (e.g. a preview host) this fails silently and
-      // the instant text/call/DM options below still work.
-      try {
-        const body = new URLSearchParams();
-        body.set("form-name", bookingForm.getAttribute("name") || "quote");
-        new FormData(bookingForm).forEach((v, k) => body.set(k, v));
-        fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() }).catch(() => {});
-      } catch (_) {
-        /* no-op */
-      }
-
-      bookingOut.style.borderColor = "rgba(63,208,137,0.4)";
-      bookingOut.style.background = "rgba(63,208,137,0.08)";
-      bookingOut.innerHTML =
-        `Thanks, ${escapeHtml(name)} — your request is ready to send. Pick how you'd like to reach us:` +
+      const smsHref = `sms:${BUSINESS.tel}?body=${enc}`;
+      const actionMarkup =
         `<span class="booking__send">` +
         `<a class="btn btn--gold btn--sm" href="${smsHref}">Send as text</a>` +
         `<a class="btn btn--ghost btn--sm" href="tel:${BUSINESS.tel}">Call now</a>` +
         `<a class="btn btn--ghost btn--sm" href="${BUSINESS.instagram}" target="_blank" rel="noopener">DM Instagram</a>` +
         `<button class="btn btn--ghost btn--sm" type="button" data-copy-msg>Copy message</button>` +
         `</span>`;
-      // sms:/tel: links go nowhere on most desktops — give those visitors a
-      // clipboard fallback so the quote text is never trapped in the form.
+
+      const submitButton = bookingForm.querySelector('button[type="submit"]');
+      const originalSubmitLabel = submitButton ? submitButton.textContent : "";
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Sending…";
+      }
+      bookingForm.setAttribute("aria-busy", "true");
+      bookingOut.style.borderColor = "rgba(215,168,79,0.45)";
+      bookingOut.style.background = "rgba(215,168,79,0.08)";
+      bookingOut.textContent = "Sending your quote request…";
+
+      let sent = false;
+      try {
+        const response = await fetch(bookingForm.action, {
+          method: "POST",
+          body: data,
+          headers: { Accept: "application/json" },
+        });
+        sent = response.ok;
+      } catch (_) {
+        sent = false;
+      } finally {
+        bookingForm.removeAttribute("aria-busy");
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = originalSubmitLabel;
+        }
+      }
+
+      if (sent) {
+        bookingOut.style.borderColor = "rgba(63,208,137,0.4)";
+        bookingOut.style.background = "rgba(63,208,137,0.08)";
+        bookingOut.innerHTML =
+          `Thanks, ${escapeHtml(name)} — your quote request was sent. We'll follow up using the contact you provided.` +
+          actionMarkup;
+      } else {
+        bookingOut.style.borderColor = "rgba(255,111,72,0.5)";
+        bookingOut.style.background = "rgba(255,111,72,0.08)";
+        bookingOut.innerHTML =
+          "We couldn't send the form automatically. Nothing has been confirmed yet — please use one of these options:" +
+          actionMarkup;
+      }
+
+      // Keep a direct-send fallback available on both success and failure.
       const copyBtn = bookingOut.querySelector("[data-copy-msg]");
       if (copyBtn) {
         copyBtn.addEventListener("click", () => {
-          const done = () => {
+          const copied = () => {
             copyBtn.textContent = "Copied — paste it in a text or DM";
           };
+          const copyFailed = () => {
+            copyBtn.textContent = "Copy unavailable — use text or DM";
+          };
           if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(message).then(done, done);
+            navigator.clipboard.writeText(message).then(copied, copyFailed);
           } else {
-            done();
+            copyFailed();
           }
         });
       }
@@ -1737,9 +1766,9 @@
     greeting:
       "Hey! I can help with starlight headliners, shooting stars, interior & exterior lighting, custom headliners, butterfly doors, and DIY kits — plus pricing and booking. What are you thinking about?",
     pricing:
-      `Most work is custom-quoted by vehicle and the look you want — a starlight headliner depends on the star count (we start at a 300-star kit and go up to 4,000; try the designer above to preview any size), and lighting or butterfly doors are quoted per build. Send your vehicle and the look and we'll get you an exact number. Call or text ${BUSINESS.phone}.`,
+      `Most work is custom-quoted by vehicle and the look you want — a starlight headliner depends on the star count (we start at a 300-star kit and go up to 4,400; try the designer above to preview any size), and lighting or butterfly doors are quoted per build. Send your vehicle and the look and we'll get you an exact number. Call or text ${BUSINESS.phone}.`,
     starlight:
-      "Starlight headliners are our specialty — individual fiber-optic stars in purple, ice white, blue, or an RGB mix, with custom density and patterns. Kits start at 300 stars and go up to 4,000. Use the designer above to preview a size on a real headliner shape, or plot your own constellation, then hit \"Use this design for my quote.\"",
+      "Starlight headliners are our specialty — individual fiber-optic stars in purple, ice white, blue, or an RGB mix, with custom density and patterns. Kits start at 300 stars and go up to 4,400. Use the designer above to preview a size on a real headliner shape, or plot your own constellation, then hit \"Use this design for my quote.\"",
     shooting:
       "Shooting stars add animated meteor streaks across the headliner for that high-end look. Toggle \"Add shooting stars\" in the designer to see it, and we'll quote it as an add-on to your starlight install.",
     interior:
@@ -1757,7 +1786,7 @@
     location:
       "We're in the Bay Area — Walnut Creek and the greater East Bay. Reach out and we'll sort out scheduling.",
     hours:
-      `We open at 9:30 AM. The fastest way to reach us is call or text ${BUSINESS.phone}, or DM @bayareaautocustomz.`,
+      `Call or text ${BUSINESS.phone} for current availability, or DM @bayareaautocustomz.`,
     // Read the rating + count from the page at answer time so the assistant can
     // never contradict the site (initReviews updates those spans when the live
     // Google-reviews feed is connected).
@@ -1767,7 +1796,7 @@
       return `We're rated ${score.trim()} stars on Google across ${count.trim()} reviews — see the Reviews section, and there's a link to read them all on Google.`;
     },
     visualizer:
-      "Scroll up to the designer: pick a kit size (300–4,000 stars) to preview the density on a real headliner shape, switch to \"Design your own\" to place stars one by one, pick a color, add shooting stars, then save the preview PNG and attach it when you text or DM us.",
+      "Scroll up to the designer: pick a kit size (300–4,400 stars) to preview the density on a real headliner shape, switch to \"Design your own\" to place stars one by one, pick a color, add shooting stars, then save the preview PNG and have it ready to send when you text or DM us.",
     default:
       `Happy to help. For the most accurate answer, tell me your vehicle and the look you want, or call/text ${BUSINESS.phone}. You can also try the starlight designer above to preview your headliner.`,
   };
