@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#070707" />
+    <!-- CSP backstop: the live feed/reviews sections render third-party JSON, so
+         lock scripts to this origin. style 'unsafe-inline' covers the inline
+         style="" positioning attrs; img/connect allow any https for feed media. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self'; frame-src https://cal.com https://app.cal.com; connect-src 'self' https:; base-uri 'self'"
+    />
+
+    <title>Bay Area Auto Customz | Starlight Headliners &amp; Custom Auto Lighting</title>
+    <meta
+      name="description"
+      content="Starlight headliners, custom &amp; ambient auto lighting, and butterfly doors in the East Bay. 4.9 stars on Google — design your starlight and get a quote by text."
+    />
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23070707'/%3E%3Ctext x='16' y='21' font-family='Arial' font-size='12' font-weight='900' fill='%23d7a84f' text-anchor='middle'%3EBAC%3C/text%3E%3C/svg%3E" type="image/svg+xml" />
+
+    <!-- Absolute URLs use the custom domain. The site is served at the domain
+         root (deploy publish dir = this folder), so these are root-relative. -->
+    <link rel="canonical" href="https://bayareaautocustomz.com/" />
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+
+    <meta property="og:type" content="business.business" />
+    <meta property="og:site_name" content="Bay Area Auto Customz" />
+    <meta property="og:url" content="https://bayareaautocustomz.com/" />
+    <meta property="og:title" content="Bay Area Auto Customz | Starlight Headliners &amp; Custom Auto Lighting" />
+    <meta property="og:description" content="Starlight headliners, custom lighting, Alcantara headliners, and butterfly doors. 4.9 stars on Google. Design your starlight live, then request a quote." />
+    <meta property="og:image" content="https://bayareaautocustomz.com/images/starlight-mercedes-wide.jpg" />
+    <meta property="og:image:width" content="1600" />
+    <meta property="og:image:height" content="1200" />
+    <meta property="og:image:alt" content="White Mercedes with its doors open and a starlight headliner lit up in the Bay Area Auto Customz shop" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://bayareaautocustomz.com/images/starlight-mercedes-wide.jpg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Load fonts without blocking first paint; app.js flips media to "all"
+         (an inline onload handler would violate the CSP above). -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap"
+      media="print"
+      data-font-link
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap"
+      />
+    </noscript>
+    <link rel="stylesheet" href="styles.css" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "AutomotiveBusiness",
+        "name": "Bay Area Auto Customz",
+        "description": "Starlight headliners, interior and exterior lighting, custom headliners, and butterfly doors.",
+        "telephone": "+1-925-536-5086",
+        "areaServed": "San Francisco Bay Area, CA",
+        "url": "https://bayareaautocustomz.com/",
+        "image": "https://bayareaautocustomz.com/images/starlight-mercedes-wide.jpg",
+        "priceRange": "$$",
+        "address": { "@type": "PostalAddress", "addressRegion": "CA", "addressLocality": "Walnut Creek", "addressCountry": "US" },
+        "sameAs": [
+          "https://www.instagram.com/bayareaautocustomz/",
+          "https://www.tiktok.com/@bayareaautocustomz"
+        ]
+      }
+    </script>
+  </head><body style="background:#0a0a0f"><section class="section" id="work">
+          <div class="section__intro">
+            <span class="eyebrow">Real builds</span>
+            <h2>Work straight from the shop.</h2>
+            <p>
+              Pulled from the Bay Area Auto Customz Instagram and TikTok. Tap through to the live
+              feeds for the latest reveals, before/afters, and night-cabin shots.
+            </p>
+          </div>
+
+          <!-- Real shop photos (approved by Sergio) live in ./images/ — see images/README.txt
+               to add more. Every photo opens in the lightbox (wired in app.js). -->
+          <div class="gallery">
+            <article class="tile tile--tall">
+              <button class="media-zoom" type="button" data-lightbox aria-label="View larger photo">
+                <img
+                  class="tile__media"
+                  src="images/starlight-roof-purple.jpg"
+                  srcset="images/starlight-roof-purple-800.jpg 800w, images/starlight-roof-purple.jpg 1400w"
+                  sizes="(max-width: 680px) 92vw, (max-width: 1040px) 46vw, 350px"
+                  alt="Purple starlight headliner glowing above the front seats of a Mercedes C-Class"
+                  loading="lazy"
+                  width="1400"
+                  height="1867"
+                />
+              </button>
+              <div class="tile__body">
+                <span class="tag">Most requested</span>
+                <h3>Starlight headliner</h3>
+                <p>Hundreds of individually set fiber stars — density, color, and pattern all custom.</p>
+                <a class="tile__link" href="https://www.instagram.com/bayareaautocustomz/" target="_blank" rel="noopener">View on Instagram</a>
+              </div>
+            </article>
+            <article class="tile">
+              <button class="media-zoom" type="button" data-lightbox aria-label="View larger photo">
+                <img
+                  class="tile__media"
+                  src="images/starlight-white-ice.jpg"
+                  srcset="images/starlight-white-ice-800.jpg 800w, images/starlight-white-ice.jpg 1400w"
+                  sizes="(max-width: 680px) 92vw, (max-width: 1040px) 46vw, 350px"
+                  alt="Ice-white starlight headliner over black leather seats in a Mercedes"
+                  loading="lazy"
+                  width="1400"
+                  height="1867"
+                />
+              </button>
+              <div class="tile__body">
+                <span class="tag">Night cabin</span>
+                <h3>Ice-white starlight</h3>
+                <p>A colder, cleaner star field — subtle by day, unreal at night.</p>
+                <a class="tile__link" href="https://www.tiktok.com/@bayareaautocustomz" target="_blank" rel="noopener">Watch on TikTok</a>
+              </div>
+            </article>
+            <article class="tile">
+              <button class="media-zoom" type="button" data-lightbox aria-label="View larger photo">
+                <img
+                  class="tile__media"
+                  src="images/ambient-door-speaker.jpg"
+                  srcset="images/ambient-door-speaker-800.jpg 800w, images/ambient-door-speaker.jpg 1400w"
+                  sizes="(max-width: 680px) 92vw, (max-width: 1040px) 46vw, 350px"
+                  alt="Blue ambient lighting tracing the door panel and glowing speaker grille in a Corvette"
+                  loading="lazy"
+                  width="1400"
+                  height="1867"
+                />
+              </button>
+              <div class="tile__body">
+                <span class="tag">Ambient glow</span>
+                <h3>Ambient interior lighting</h3>
+                <p>Door, dash, and footwell glow with clean color control.</p>
+                <a class="tile__link" href="#ambient">See the ambient kits</a>
+              </div>
+            </article>
+            <article class="tile">
+              <button class="media-zoom" type="button" data-lightbox aria-label="View larger photo">
+                <img
+                  class="tile__media"
+                  src="images/starlight-mercedes-wide.jpg"
+                  srcset="images/starlight-mercedes-wide-800.jpg 800w, images/starlight-mercedes-wide.jpg 1600w"
+                  sizes="(max-width: 680px) 92vw, (max-width: 1040px) 46vw, 350px"
+                  alt="White Mercedes with doors open, starlight headliner lit and logo puddle lights on the shop floor"
+                  loading="lazy"
+                  width="1600"
+                  height="1200"
+                />
+              </button>
+              <div class="tile__body">
+                <span class="tag">Full build</span>
+                <h3>Doors-open reveal</h3>
+                <p>Starlight roof, ambient trim, and puddle lights — the whole package.</p>
+                <a class="tile__link" href="https://www.instagram.com/bayareaautocustomz/" target="_blank" rel="noopener">See builds</a>
+              </div>
+            </article>
+          </div>
+
+          <div class="shots">
+            <figure class="shot">
+              <button class="media-zoom" type="button" data-lightbox aria-label="View larger photo">
+                <img
+                  src="images/starlight-mercedes-cabin.jpg"
+                  srcset="images/starlight-mercedes-cabin-800.jpg 800w, images/starlight-mercedes-cabin.jpg 1400w"
+                  sizes="(max-width: 680px) 92vw, (max-width: 1040px) 46vw, 350px"
+                  alt="Starlight roof over the rear cabin of a Mercedes C-Class"
+                  loading="lazy"
+                  width="1400"
+                  height="1867"
+                />
+              </button>
+              <figcaption>Rear-cabin star coverage</figcaption>
+            </figure>
+            <figure class="shot">
+              <button class="media-zoom" type="button" data-lightbox aria-label="View larger photo">
+                <img
+                  src="images/starlight-console-white.jpg"
+                  srcset="images/starlight-console-white-800.jpg 800w, images/starlight-console-white.jpg 1400w"
+                  sizes="(max-width: 680px) 92vw, (max-width: 1040px) 46vw, 350px"
+                  alt="Lit center console trim with a starlight headliner above in a Mercedes"
+                  loading="lazy"
+                  width="1400"
+                  height="1867"
+                />
+              </button>
+              <figcaption>Console glow + starlight</figcaption>
+            </figure>
+            <figure class="shot">
+              <button class="media-zoom" type="button" data-lightbox aria-label="View larger photo">
+                <img
+                  src="images/starlight-roof-console.jpg"
+                  srcset="images/starlight-roof-console-800.jpg 800w, images/starlight-roof-console.jpg 1400w"
+                  sizes="(max-width: 680px) 92vw, (max-width: 1040px) 46vw, 350px"
+                  alt="Starlight headliner and illuminated dash trim seen from the open driver door"
+                  loading="lazy"
+                  width="1400"
+                  height="1050"
+                />
+              </button>
+              <figcaption>From the driver&rsquo;s door</figcaption>
+            </figure>
+            <figure class="shot">
+              <button class="media-zoom" type="button" data-lightbox aria-label="View larger photo">
+                <img
+                  src="images/starlight-roof-doors.jpg"
+                  srcset="images/starlight-roof-doors-800.jpg 800w, images/starlight-roof-doors.jpg 1400w"
+                  sizes="(max-width: 680px) 92vw, (max-width: 1040px) 46vw, 350px"
+                  alt="Star fibers wrapping the roof and pillars of a Mercedes cabin"
+                  loading="lazy"
+                  width="1400"
+                  height="1867"
+                />
+              </button>
+              <figcaption>Roof-to-pillar coverage</figcaption>
+            </figure>
+            <figure class="shot">
+              <button class="media-zoom" type="button" data-lightbox aria-label="View larger photo">
+                <img
+                  src="images/starlight-camaro-blue.jpg"
+                  srcset="images/starlight-camaro-blue-800.jpg 800w, images/starlight-camaro-blue.jpg 1400w"
+                  sizes="(max-width: 680px) 92vw, (max-width: 1040px) 46vw, 350px"
+                  alt="Ice-blue starlight headliner over blue leather seats in a Camaro"
+                  loading="lazy"
+                  width="1400"
+                  height="1867"
+                />
+              </button>
+              <figcaption>Ice-blue starlight — Camaro</figcaption>
+            </figure>
+            <figure class="shot shot--featured">
+              <button class="media-zoom" type="button" data-lightbox aria-label="View larger photo">
+                <img
+                  src="images/shop-craft-01.jpg"
+                  srcset="images/shop-craft-01-800.jpg 800w, images/shop-craft-01.jpg 1400w"
+                  sizes="(max-width: 680px) 92vw, (max-width: 1040px) 46vw, 350px"
+                  alt="Sergio working across the rear deck of a white Corvette inside the Bay Area Auto Customz shop"
+                  loading="lazy"
+                  width="1400"
+                  height="1867"
+                />
+              </button>
+              <figcaption>The craft behind every build</figcaption>
+            </figure>
+            <figure class="shot">
+              <button class="media-zoom" type="button" data-lightbox aria-label="View larger photo">
+                <img
+                  src="images/shop-craft-02.jpg"
+                  srcset="images/shop-craft-02-800.jpg 800w, images/shop-craft-02.jpg 1400w"
+                  sizes="(max-width: 680px) 92vw, (max-width: 1040px) 46vw, 350px"
+                  alt="Installer crouched with tools during a careful rear teardown on the Corvette"
+                  loading="lazy"
+                  width="1400"
+                  height="1867"
+                />
+              </button>
+              <figcaption>Every install starts with a careful teardown</figcaption>
+            </figure>
+            <figure class="shot">
+              <button class="media-zoom" type="button" data-lightbox aria-label="View larger photo">
+                <img
+                  src="images/shop-craft-03.jpg"
+                  srcset="images/shop-craft-03-800.jpg 800w, images/shop-craft-03.jpg 1400w"
+                  sizes="(max-width: 680px) 92vw, (max-width: 1040px) 46vw, 350px"
+                  alt="Sergio at the Corvette with another customer build on the lift behind him"
+                  loading="lazy"
+                  width="1400"
+                  height="1867"
+                />
+              </button>
+              <figcaption>Real shop, real builds</figcaption>
+            </figure>
+            <figure class="shot">
+              <button class="media-zoom" type="button" data-lightbox aria-label="View larger photo">
+                <img
+                  src="images/shop-craft-04.jpg"
+                  srcset="images/shop-craft-04-800.jpg 800w, images/shop-craft-04.jpg 1400w"
+                  sizes="(max-width: 680px) 92vw, (max-width: 1040px) 46vw, 350px"
+                  alt="Careful panel detail work along the Corvette's rear quarter"
+                  loading="lazy"
+                  width="1400"
+                  height="1867"
+                />
+              </button>
+              <figcaption>Detail work, panel by panel</figcaption>
+            </figure>
+          </div>
+
+          <div class="social-row">
+            <a class="social-pill" href="https://www.instagram.com/bayareaautocustomz/" target="_blank" rel="noopener">
+              <span aria-hidden="true">◎</span> @bayareaautocustomz on Instagram
+            </a>
+            <a class="social-pill" href="https://www.tiktok.com/@bayareaautocustomz" target="_blank" rel="noopener">
+              <span aria-hidden="true">♪</span> @bayareaautocustomz on TikTok
+            </a>
+          </div>
+        </section>
+
+        <!-- ====================== LIVE SOCIAL FEED ====================== -->
+        <!--
+          Auto-updating feed. When a live feed is connected (see below), the
+          newest Instagram/TikTok posts render here automatically — no code
+          changes when Sergio posts. Until then, the curated cards below show
+          so the section is always complete.
+
+          TO GO LIVE (one-time, ~5 min):
+            1. Create a free feed at https://behold.so and connect the
+               @bayareaautocustomz Instagram account.
+            2. Copy the feed's JSON URL (looks like
+               https://feeds.behold.so/XXXXXXXX).
+            3. Paste it into data-feed-url on the .feed element below.
+          The grid then shows the latest posts and refreshes on its own.
+          (Any service that returns a compatible JSON feed works too — see
+          images/README.txt.)
+        -->
+        </body></html>
