@@ -921,6 +921,10 @@
     }
 
     canvas.addEventListener("pointerdown", (ev) => {
+      // Star placement is a design-mode feature (mirrors the keyboard guard below).
+      // In kit-preview mode a tap/drag must NOT silently add stars and shift the
+      // quote — and on touch it must not eat the scroll (2026-07-28 audit).
+      if (state.mode !== "design") return;
       ev.preventDefault();
       state.painting = true;
       state.lastPoint = null;
@@ -1102,6 +1106,9 @@
         btn.classList.add("is-active");
         state.mode = btn.dataset.mode;
         const design = state.mode === "design";
+        // touch-action lives here (not CSS) so kit-preview taps scroll normally
+        // while design mode keeps full pointer capture (2026-07-28 audit).
+        canvas.style.touchAction = design ? "none" : "pan-y";
         if (els.designTools) els.designTools.hidden = !design;
         if (!design) {
           state.tool = "star";
@@ -2112,6 +2119,26 @@
 
     let loaded = false;
     btn.hidden = false;
+    // Embed-failure fallback (2026-07-28 audit): if the Cal.com iframe never
+    // fires load (blocked embed, network hiccup), don't leave a blank dialog —
+    // surface a direct link so the customer can still book.
+    let frameLoaded = false;
+    frame.addEventListener("load", () => { frameLoaded = true; });
+    const armFallback = () => {
+      setTimeout(() => {
+        if (frameLoaded || !modal.open || modal.querySelector(".calmodal__fallback")) return;
+        const p = document.createElement("p");
+        p.className = "calmodal__fallback";
+        p.style.cssText = "margin:12px 0 0;text-align:center;font-size:14px;";
+        const a = document.createElement("a");
+        a.href = calUrl.toString();
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.textContent = "Booking is slow to load — tap here to open it in a new tab";
+        p.appendChild(a);
+        frame.insertAdjacentElement("afterend", p);
+      }, 7000);
+    };
     const open = () => {
       if (!loaded) {
         calUrl.searchParams.set("embed", "true");
@@ -2119,6 +2146,7 @@
         loaded = true;
       }
       modal.showModal();
+      armFallback();
       document.body.style.overflow = "hidden";
       requestAnimationFrame(() => closeBtn.focus());
     };

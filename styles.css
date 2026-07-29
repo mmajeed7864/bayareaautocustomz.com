@@ -737,7 +737,7 @@ canvas#headliner {
   border-radius: 1.6rem;
   background: #050505;
   cursor: crosshair;
-  touch-action: none;
+  touch-action: pan-y; /* design mode sets "none" via JS (2026-07-28 audit) */
 }
 
 .canvas-hint {
