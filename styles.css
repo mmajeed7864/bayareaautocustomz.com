@@ -828,34 +828,25 @@ canvas#headliner {
    phone they squashed into wide ovals and "4,400" crowded its own pill
    (client-reported 2026-07-28). A grid keeps every chip identical, and 12
    divides evenly by 6 / 4 / 3 — no orphan chip at any breakpoint. */
+/* Sized by the CONTAINER, not the viewport — this panel is ~283px inside the
+   desktop configurator but ~390px full-width on a phone, so viewport media
+   queries get it exactly backwards (desktop rendered 41x41px circles while
+   mobile looked fine, 2026-07-28).
+   auto-fit + a 24rem cap keeps the column count at 2, 3, or 4 — and 12 chips
+   divide evenly by all three, so there is never an orphan row, and every chip
+   stays wide enough to read as a pill rather than a circle. */
 .chips--kits {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(4.75rem, 1fr));
   gap: 0.5rem;
+  max-width: 24rem;
 }
 
 .chips--kits .chip {
   min-width: 0;
   padding-inline: 0.5rem;
+  border-radius: 0.85rem;
   font-variant-numeric: tabular-nums;
-}
-
-@media (max-width: 760px) {
-  .chips--kits {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 400px) {
-  .chips--kits {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.45rem;
-  }
-
-  .chips--kits .chip {
-    padding-inline: 0.35rem;
-    font-size: 0.8rem;
-  }
 }
 
 .chip,
