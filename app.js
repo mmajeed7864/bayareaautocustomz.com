@@ -2299,3 +2299,33 @@
     }
   })(last);
 })();
+
+/* --------------------------------------------------- open-now badge (2026-07-29)
+   Hours come from the verified Google Business Profile: 9:30am-12am every day.
+   Computed in the SHOP's timezone, not the visitor's, so someone browsing from
+   another state doesn't see a wrong "Open now". */
+(function openNow() {
+  const el = document.querySelector("[data-open-now]");
+  if (!el) return;
+  const OPEN_MIN = 9 * 60 + 30;      // 09:30
+  const CLOSE_MIN = 24 * 60;         // midnight
+  function paint() {
+    let mins;
+    try {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Los_Angeles", hour: "2-digit", minute: "2-digit", hour12: false,
+      }).formatToParts(new Date());
+      const h = +parts.find((p) => p.type === "hour").value;
+      const m = +parts.find((p) => p.type === "minute").value;
+      mins = (h % 24) * 60 + m;
+    } catch {
+      return;                        // no reliable shop-local time: say nothing
+    }
+    const open = mins >= OPEN_MIN && mins < CLOSE_MIN;
+    el.textContent = open ? "Open now" : "Closed";
+    el.className = "visit__now " + (open ? "visit__now--open" : "visit__now--closed");
+    el.hidden = false;
+  }
+  paint();
+  setInterval(paint, 60000);
+})();
