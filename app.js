@@ -2176,7 +2176,9 @@
 (function starlightHeadliner() {
   const cv = document.getElementById("starfield");
   if (!cv) return;
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  // Calm mode, not off: twinkle is pure opacity (safe under reduced motion);
+  // only the scroll drift and shooting-star streaks are suppressed.
+  const CALM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const ctx = cv.getContext("2d", { alpha: true });
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -2244,13 +2246,13 @@
     // scroll energy: the field glows and drifts while you move
     glow += (Math.min(Math.abs(vel) / 55, 1) - glow) * 0.08;
     vel *= 0.92;
-    const drift = (scrollY * 0.06) % (H || 1);
+    const drift = CALM ? 0 : (scrollY * 0.06) % (H || 1);
 
     ctx.clearRect(0, 0, W, H);
 
     for (let i = 0; i < stars.length; i++) {
       const s = stars[i];
-      s.tw += (dt / 1000) * s.sp * (1 + glow * 1.6);
+      s.tw += (dt / 1000) * s.sp * (CALM ? 0.55 : 1 + glow * 1.6);
       const t = 0.5 + Math.sin(s.tw) * 0.5;
       const a = Math.min(1, s.base * (0.45 + t * 0.75) * (1 + glow * 0.5));
       let y = s.y * H - drift * s.depth;
@@ -2270,8 +2272,8 @@
     }
 
     // shooting stars — rarer when idle, livelier while scrolling
-    nextShot -= dt * (1 + glow * 2.5);
-    if (nextShot <= 0) {
+    nextShot -= CALM ? 0 : dt * (1 + glow * 2.5);
+    if (!CALM && nextShot <= 0) {
       spawnShooter();
       nextShot = 5200 + Math.random() * 6500;
     }

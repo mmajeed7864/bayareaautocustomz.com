@@ -3131,8 +3131,12 @@ img.tile__media {
   z-index: 1;
 }
 
+/* Reduced motion keeps the stars — twinkling is an opacity change, not
+   vestibular motion. The JS drops the drift and shooting stars instead.
+   (Hiding it outright meant Ravi's reduce-motion laptop saw a plain black
+   page while everyone else saw the headliner, 2026-07-28.) */
 @media (prefers-reduced-motion: reduce) {
   #starfield {
-    display: none;
+    opacity: 0.75;
   }
 }
