@@ -824,9 +824,38 @@ canvas#headliner {
   gap: 0.5rem;
 }
 
+/* 12 kit sizes: flex:1 stretched each chip to fill leftover row space, so on a
+   phone they squashed into wide ovals and "4,400" crowded its own pill
+   (client-reported 2026-07-28). A grid keeps every chip identical, and 12
+   divides evenly by 6 / 4 / 3 — no orphan chip at any breakpoint. */
+.chips--kits {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
 .chips--kits .chip {
-  flex: 1;
-  min-width: 3.2rem;
+  min-width: 0;
+  padding-inline: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 760px) {
+  .chips--kits {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 400px) {
+  .chips--kits {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .chips--kits .chip {
+    padding-inline: 0.35rem;
+    font-size: 0.8rem;
+  }
 }
 
 .chip,
@@ -935,10 +964,26 @@ canvas#headliner {
 /* Vertical reel cards (9:16, like the phone clips they are) that play in place
    on tap. They wrap into tidy rows on desktop and become a swipeable snap strip
    below 1040px, so any number of clips lays out cleanly. */
+/* Six curated clips (was 11 — four were red variants, three purple). Three
+   across gives each clip real presence instead of a wall of thumbnails
+   (client-reported "crowded", 2026-07-28). */
 .reels {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.1rem;
+}
+
+@media (max-width: 900px) {
+  .reels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .reels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
 }
 
 .reel {
