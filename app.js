@@ -2165,3 +2165,135 @@
     });
   })();
 })();
+
+/* ------------------------------------------------ starlight headliner (2026-07-28)
+   Sergio's site IS a starlight install: fiber-optic stars twinkle behind the
+   whole page, the field brightens and drifts as you scroll (like fibers
+   catching light when you move under them), and shooting stars streak
+   occasionally — the same "shooting star" feature he sells.
+   Cheap by design: one canvas, one rAF, DPR-capped, paused when the tab is
+   hidden, and fully off for prefers-reduced-motion. */
+(function starlightHeadliner() {
+  const cv = document.getElementById("starfield");
+  if (!cv) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const ctx = cv.getContext("2d", { alpha: true });
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  let W = 0, H = 0, stars = [], shooters = [];
+
+  function size() {
+    W = cv.width = Math.floor(innerWidth * DPR);
+    H = cv.height = Math.floor(innerHeight * DPR);
+    cv.style.width = innerWidth + "px";
+    cv.style.height = innerHeight + "px";
+    // density tuned to area, capped so phones stay smooth
+    const target = Math.min(190, Math.round((innerWidth * innerHeight) / 9000));
+    stars = [];
+    for (let i = 0; i < target; i++) {
+      const warm = Math.random() < 0.18;           // a few warm/amber fibers
+      const icy = !warm && Math.random() < 0.22;   // a few ice-blue fibers
+      stars.push({
+        x: Math.random(),
+        y: Math.random(),
+        r: (Math.random() * 1.25 + 0.35) * DPR,
+        base: Math.random() * 0.5 + 0.25,
+        tw: Math.random() * Math.PI * 2,
+        sp: Math.random() * 0.9 + 0.35,            // twinkle speed
+        depth: Math.random() * 0.6 + 0.4,          // parallax depth
+        hue: warm ? "255,214,150" : icy ? "185,222,255" : "255,255,255",
+      });
+    }
+  }
+  size();
+  addEventListener("resize", size, { passive: true });
+
+  let scrollY0 = scrollY, vel = 0, glow = 0, nextShot = 2500;
+  addEventListener("scroll", () => {
+    const d = scrollY - scrollY0;
+    scrollY0 = scrollY;
+    vel = vel * 0.7 + d * 0.3;
+  }, { passive: true });
+
+  let running = true;
+  document.addEventListener("visibilitychange", () => {
+    running = !document.hidden;
+    if (running) last = performance.now();
+  });
+
+  function spawnShooter() {
+    const fromLeft = Math.random() < 0.5;
+    shooters.push({
+      x: fromLeft ? -0.05 : 1.05,
+      y: Math.random() * 0.55,
+      vx: (fromLeft ? 1 : -1) * (0.0009 + Math.random() * 0.0007),
+      vy: 0.00035 + Math.random() * 0.00035,
+      life: 0,
+      max: 900 + Math.random() * 500,
+      len: 90 + Math.random() * 110,
+    });
+  }
+
+  let last = performance.now();
+  (function draw(now) {
+    requestAnimationFrame(draw);
+    if (!running) return;
+    const dt = Math.min(now - last, 50);
+    last = now;
+
+    // scroll energy: the field glows and drifts while you move
+    glow += (Math.min(Math.abs(vel) / 55, 1) - glow) * 0.08;
+    vel *= 0.92;
+    const drift = (scrollY * 0.06) % (H || 1);
+
+    ctx.clearRect(0, 0, W, H);
+
+    for (let i = 0; i < stars.length; i++) {
+      const s = stars[i];
+      s.tw += (dt / 1000) * s.sp * (1 + glow * 1.6);
+      const t = 0.5 + Math.sin(s.tw) * 0.5;
+      const a = Math.min(1, s.base * (0.45 + t * 0.75) * (1 + glow * 0.5));
+      let y = s.y * H - drift * s.depth;
+      if (y < 0) y += H;                       // wrap for endless sky
+      const r = s.r * (0.75 + t * 0.5);
+      ctx.beginPath();
+      ctx.arc(s.x * W, y, r, 0, 6.283);
+      ctx.fillStyle = "rgba(" + s.hue + "," + a.toFixed(3) + ")";
+      ctx.fill();
+      // brightest fibers get a soft halo, like real fiber-optic tips
+      if (t > 0.86 && s.r > 1.1 * DPR) {
+        ctx.beginPath();
+        ctx.arc(s.x * W, y, r * 3.2, 0, 6.283);
+        ctx.fillStyle = "rgba(" + s.hue + "," + (a * 0.1).toFixed(3) + ")";
+        ctx.fill();
+      }
+    }
+
+    // shooting stars — rarer when idle, livelier while scrolling
+    nextShot -= dt * (1 + glow * 2.5);
+    if (nextShot <= 0) {
+      spawnShooter();
+      nextShot = 5200 + Math.random() * 6500;
+    }
+    for (let i = shooters.length - 1; i >= 0; i--) {
+      const p = shooters[i];
+      p.life += dt;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      const k = p.life / p.max;
+      if (k >= 1 || p.x < -0.15 || p.x > 1.15) { shooters.splice(i, 1); continue; }
+      const fade = Math.sin(Math.PI * k);        // fade in then out
+      const x = p.x * W, y = p.y * H;
+      const g = ctx.createLinearGradient(x, y, x - p.vx * p.len * 1000, y - p.vy * p.len * 1000);
+      g.addColorStop(0, "rgba(255,255,255," + (0.75 * fade).toFixed(3) + ")");
+      g.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 1.5 * DPR;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x - p.vx * p.len * 1000, y - p.vy * p.len * 1000);
+      ctx.stroke();
+    }
+  })(last);
+})();

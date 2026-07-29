@@ -3112,3 +3112,27 @@ img.tile__media {
 .gallery {
   row-gap: 1.35rem;
 }
+
+/* ------------------------------------------------- starlight headliner
+   The whole page reads as one of Sergio's installs: fiber stars twinkling
+   behind the content, brighter as you scroll (like the fibers catching
+   light), with occasional shooting stars. Fixed + pointer-events:none so it
+   never interferes; hidden entirely for reduced-motion. */
+#starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.shell {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #starfield {
+    display: none;
+  }
+}
