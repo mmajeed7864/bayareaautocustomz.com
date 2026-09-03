@@ -1854,7 +1854,7 @@
     booking:
       `Booking is easy: use the quote form on this page, or call/text ${BUSINESS.phone}. You can also DM us on Instagram (@bayareaautocustomz). Tell us your vehicle, the look you want, and timing, and we'll confirm a quote and an install date.`,
     location:
-      "We're in the Bay Area — Walnut Creek and the greater East Bay. Reach out and we'll sort out scheduling.",
+      "We're in the Bay Area — Pittsburg and the greater East Bay. Reach out and we'll sort out scheduling.",
     hours:
       `Call or text ${BUSINESS.phone} for current availability, or DM @bayareaautocustomz.`,
     // Read the rating + count from the page at answer time so the assistant can
@@ -1962,7 +1962,7 @@
     if (has(/\b(interior|ambient|footwell|door light\w*|dash light\w*|rgb|led strip)\b/)) return "interior";
     if (has(/\b(star|starlight|starlit|fiber|fibre|headliner|twinkle|ceiling|night sky|roof light\w*)\b/)) return "starlight";
     if (has(/\b(design\w*|visualizer|preview|demo|simulate|try it)\b/)) return "visualizer";
-    if (has(/\b(where|location|address|located|walnut creek|bay area|east bay)\b/)) return "location";
+    if (has(/\b(where|location|address|located|pittsburg|bay area|east bay)\b/)) return "location";
     if (has(/\b(hour|open|close|today|when)\b/)) return "hours";
     if (has(/\b(review|rating|google|trust)\b/)) return "reviews";
     if (has(/\b(hi|hey|hello|yo|sup|whats up)\b/)) return "greeting";
