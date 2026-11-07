@@ -1669,6 +1669,19 @@
     });
   }
 
+  /* ========================= QUICK DETAIL ============================= */
+  $$("[data-detail]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      prefillBooking({
+        service: "Quick detail",
+        details: "Interested in the " + btn.dataset.detail,
+        replaceDetails: true,
+        scroll: true,
+        focus: true,
+      });
+    });
+  });
+
   /* ====================== TAKE-HOME DIY KITS ========================== */
   $$("[data-kit-quote]").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -1834,7 +1847,7 @@
 
   const ANSWERS = {
     greeting:
-      "Hey! I can help with starlight headliners, shooting stars, interior & exterior lighting, custom headliners, butterfly doors, and take-home DIY kits — plus pricing and booking. What are you thinking about?",
+      "Hey! I can help with starlight headliners, shooting stars, interior & exterior lighting, custom headliners, butterfly doors, quick details, and take-home DIY kits — plus pricing and booking. What are you thinking about?",
     pricing:
       `Installed work is priced separately by vehicle and build. Take-home starlight kits are $100–$350 for 300–1,100 stars. Take-home ambient kits are Basic $150 + shipping, Premium $250 + shipping, and Premium Plus $350. The shooting-star take-home add-on is still ask-for-pricing. Call or text ${BUSINESS.phone} for availability.`,
     starlight:
@@ -1849,6 +1862,8 @@
       "Beyond stars, we replace and wrap headliners in suede / Alcantara and do custom trim accents. Great paired with a starlight install.",
     doors:
       "Yes — we do butterfly (vertical) door conversions, installed clean and reliable. Send your vehicle and we'll let you know fitment and pricing.",
+    detail:
+      "Quick detail packages: Basic Quick Detail $150 (exterior wax wash) · Quick Premium Wash $250 (exterior wax wash + quick interior vacuum) · Premium Plus Quick Wash $350 (wax wash, steam cleaning, vacuuming, leather/cloth cleaning, tire shine, and window cleaning). Tap a package in the Quick detail section to start your booking.",
     kits:
       "Take-home starlight kits are 300★ $100, 400★ $130, 500★ $180, 650★ $200, 750★ $250, 860★ $300, and 1,100★ $350; ask us to confirm starlight-kit shipping. Ambient take-home kits are Basic $150 + shipping (6 strips), Premium $250 + shipping (6 strips + 4 footwell lights), and Premium Plus $350 (those lights + 4 speaker halos + 4 door-storage LEDs). The shooting-star add-on is still ask-for-pricing.",
     booking:
@@ -1946,6 +1961,7 @@
     exterior: "Exterior lighting",
     headliner: "Custom / Alcantara headliner",
     doors: "Butterfly doors",
+    detail: "Quick detail",
     kits: "DIY take-home kit",
   };
 
@@ -1953,6 +1969,7 @@
     const t = ` ${singularize(normalizeText(textRaw))} `;
     const has = (re) => re.test(t);
     if (has(/\b(kit|diy|ship|shipping|buy|purchase|order)\b/)) return "kits";
+    if (has(/\b(detail\w*|wash\w*|wax\w*|vacuum\w*|steam\w*|tire shine|car clean\w*)\b/)) return "detail";
     if (has(/\b(price|pricing|cost|quote|how much|expensive|deposit|pay)\b/)) return "pricing";
     if (has(/\b(book|booking|appointment|schedule|reserve|install date|contact|call|text)\b/)) return "booking";
     if (has(/\b(butterfly|lambo|vertical|suicide) ?door\b|\bbutterfly\b/)) return "doors";
@@ -1974,6 +1991,7 @@
     const t = ` ${singularize(normalizeText(textRaw))} `;
     const has = (re) => re.test(t);
     if (has(/\b(kit|diy)\b/)) return "kits";
+    if (has(/\b(detail\w*|wash\w*|wax\w*|vacuum\w*|steam\w*|tire shine|car clean\w*)\b/)) return "detail";
     if (has(/\b(butterfly|lambo|vertical|suicide) ?door\b|\bbutterfly\b/)) return "doors";
     if (has(/\b(shoot\w* star|meteor|falling star)\b/)) return "shooting";
     if (has(/\b(exterior|underglow|under glow)\b/)) return "exterior";
